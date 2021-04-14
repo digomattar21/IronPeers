@@ -61,6 +61,7 @@ function Chat() {
                   user={user}
                   timestamp={timestamp}
                   userImage={userImage}
+                  channelId={roomId}
                 />
               );
             })}

@@ -1,17 +1,22 @@
 import React, { useEffect, useState } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import styled from "styled-components";
-import { auth } from "../../firebase";
+import { auth, db } from "../../firebase";
 import BookmarkBorderIcon from "@material-ui/icons/BookmarkBorder";
 import LabelImportantIcon from "@material-ui/icons/LabelImportant";
 import FavoriteBorderIcon from "@material-ui/icons/FavoriteBorder";
+import { useCollection } from 'react-firebase-hooks/firestore';
 
-function Message({ message, timestamp, user, userImage, id }) {
+function Message({ message, timestamp, user, userImage, id, channelId}) {
   const [userState] = useAuthState(auth);
   const [iconsShow, setIconsShow] = useState(false);
+  
 
 
-  const handleBookmarkClick = ()=>{
+  const handleBookmarkClick = (e)=>{
+    
+    
+  
     
   }
 
