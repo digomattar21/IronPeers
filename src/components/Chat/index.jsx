@@ -27,6 +27,7 @@ function Chat() {
         .orderBy("timestamp", "asc")
   );
 
+
   useEffect(() => {
     chatBottomRef?.current?.scrollIntoView({
       behavior: "smooth",
@@ -62,6 +63,7 @@ function Chat() {
                   timestamp={timestamp}
                   userImage={userImage}
                   channelId={roomId}
+                  channelName={roomDetails?.data().name}
                 />
               );
             })}

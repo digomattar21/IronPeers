@@ -17,6 +17,7 @@ import AddIcon from "@material-ui/icons/Add";
 import {useCollection} from 'react-firebase-hooks/firestore';
 import { auth, db } from "../../firebase";
 import { useAuthState } from "react-firebase-hooks/auth";
+import { Link } from "@material-ui/core";
 
 function SideBar() {
   const [addChannelInputBool, setAddChannelInputBool] = useState(false);
@@ -40,7 +41,9 @@ function SideBar() {
       <SideBarOption Icon={InsertCommentIcon} title="Threads" />
       <SideBarOption Icon={InboxIcon} title="Inbox" />
       <SideBarOption Icon={DraftsIcon} title="Saved" />
-      <SideBarOption Icon={BookmarkBorderIcon} title="Channel Browser" />
+      <a href='/bookmarks'>
+        <SideBarOption Icon={BookmarkBorderIcon} title="My Bookmarks" />
+      </a>
       <SideBarOption Icon={PeopleAltIcon} title="User groups & People" />
       <SideBarOption Icon={AppsIcon} title="Apps" />
       <SideBarOption Icon={FileCopyIcon} title="Files" />

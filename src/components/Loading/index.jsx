@@ -1,34 +1,11 @@
-import { Button } from "@material-ui/core";
 import React from "react";
-import styled from "styled-components";
-import { auth, provider } from "../../firebase";
-import Api from '../../util/api.util'
+import styled from 'styled-components'
+import Spinner from 'react-spinkit'
 
-
-function Login() {
-
-
-
-    const handleGoogleSignInClick = async (e) => {
-        e.preventDefault();
-        try{
-            let signin = await auth.signInWithPopup(provider);
-            console.log(signin);
-            let payload={username: signin.user.displayName, email: signin.user.email, profilePic:signin.user.photoURL};
-            console.log(payload);
-            let apiReq = await Api.signUpWithGoogle(payload);
-            console.log(apiReq);
-       }catch(errr){
-           console.log(errr)
-       }
-
-
-    }   
-
-
+function Loading() {
   return (
-    <LoginContainer>
-      <LoginInsideContainer>
+    <AppLoadingContainer>
+      <AppLoadingContent>
         <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
           <g id="Atom / Icon / Logo / Ironhack / M (32px)">
             <g id="icon/Ironhack">
@@ -56,53 +33,31 @@ function Login() {
             </g>
           </g>
         </svg>
-        <h1>Sign-in to <span>Iron Peers</span></h1>
-        <p>ironhack.com</p>
-
-        <Button onClick={(e)=>handleGoogleSignInClick(e)}>
-        Sign in with Google
-    </Button>
-      </LoginInsideContainer>
-
-    
-    </LoginContainer>
+        <Spinner name="ball-spin-fade-loader" color="#32c3ff" fadeIn="none" />
+      </AppLoadingContent>
+    </AppLoadingContainer>
   );
 }
 
-export default Login;
+export default Loading;
 
-const LoginContainer = styled.div`
-  background-color: #f8f8f8;
-  height: 100vh;
-  display: grid;
-  place-items: center;
+const AppLoadingContainer = styled.div`
+    display: grid;
+    place-items: center;
+    height: 100vh;
+    width: 100%;
 `;
 
-const LoginInsideContainer = styled.div`
-    padding: 100px;
-    text-align:center;
-    background-color: white;
-    border-radius: 10px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
-
+const AppLoadingContent = styled.div`
+  text-align: center;
+  padding-bottom: 100px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
   > svg {
-    object-fit: contain;
-    height: 100px;
-    margin-bottom: 40px;
-  }
-  >h1>span{
-      color: #2aaee4;
-  }
-  >Button{
-      color: white;
-      margin-top: 50px;
-      text-transform: inherit !important;
-      background-color: var(--ironblue-color) !important;
-      padding: 5px 10px;
-      margin-bottom: 50px;
-  }
-
-  >Button:hover{
-      color: black
+    height: 80px;
+    padding: 20px;
+    margin-bottom: 30px
   }
 `;
