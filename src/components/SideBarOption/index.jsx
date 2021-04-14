@@ -3,19 +3,30 @@ import styled from "styled-components";
 import AddChannelInput from "../AddChannelInput";
 import { db } from "../../firebase";
 import { useDispatch } from "react-redux";
-import {enterRoom} from '../../features/appSlice'
+import {enterRoom} from '../../features/appSlice';
+import Api from '../../util/api.util'
+import { Redirect } from "react-router";
+import {useRoutes, useRedirect} from 'hookrouter';
 
-function SideBarOption({ Icon, title, addChannel, setAddChannelInputBool, addChannelInputBool, id }) {
+function SideBarOption({ Icon, title, addChannel, setAddChannelInputBool, addChannelInputBool, id, history }) {
   const dispatch = useDispatch();
 
-  const handleAddChannel = (name) => {
+  const handleAddChannel = async(name) => {
     setAddChannelInputBool(true);
     const reg = /^[a-z]+$/i;
-    if (reg.test(name)){
+    try {
+      if (reg.test(name)){
         setAddChannelInputBool(false)
-        db.collection('rooms').add({
+       let req = await  db.collection('rooms').add({
             name: name
-        })
+        });
+        let payload = {name: name, firebaseId: req.id }
+        let req2 = await Api.addGlobalChannel(payload);
+
+    }
+      
+    } catch (error) {
+      console.log(error)
     }
 
   };

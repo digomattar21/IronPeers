@@ -6,19 +6,30 @@ import BookmarkBorderIcon from "@material-ui/icons/BookmarkBorder";
 import LabelImportantIcon from "@material-ui/icons/LabelImportant";
 import FavoriteBorderIcon from "@material-ui/icons/FavoriteBorder";
 import { useCollection } from 'react-firebase-hooks/firestore';
+import Api from '../../util/api.util';
 
-function Message({ message, timestamp, user, userImage, id, channelId}) {
+function Message({ message, timestamp, user, userImage, id, channelId, channelName}) {
   const [userState] = useAuthState(auth);
   const [iconsShow, setIconsShow] = useState(false);
   
 
 
-  const handleBookmarkClick = (e)=>{
-    
-    
-  
-    
+  const handleBookmarkClick = async (e)=>{
+      const payload = {channelId: channelId, firebaseId: id, message: message};
+      console.log('user', userState)
+      try {
+        let req = await Api.bookMarkMessage(payload); 
+        if (userState.email){
+          const newPayload = {channelId: channelId, messageFirebaseId: id, message: message, email: userState.email, messageOwner: user, channelName:channelName}
+          let updatedUserBookmarks = await Api.addUserBookMark(newPayload)
+          console.log(updatedUserBookmarks)
+        }
+      } catch (error) {
+        console.log(error)
+      }
   }
+
+
 
   return (
     <MessageContainer
