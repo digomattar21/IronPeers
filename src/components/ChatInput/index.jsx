@@ -17,13 +17,18 @@ function ChatInput({channelName, channelId, chatBottomRef}) {
         }
 
         if (message.length>3){
-            db.collection('rooms').doc(channelId).collection('messages').add({
+            try{
+            let msg = await db.collection('rooms').doc(channelId).collection('messages').add({
                 message: message,
                 timestamp: firebase.firestore.FieldValue.serverTimestamp(),
                 user: user?.displayName,
                 userImage: user?.photoURL
             });
+            
 
+            }catch(err){
+                console.log(err)
+            }
             chatBottomRef?.current.scrollIntoView({
                 behavior:"smooth"
             })
