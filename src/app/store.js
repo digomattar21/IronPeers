@@ -1,8 +1,16 @@
 import { configureStore } from '@reduxjs/toolkit';
-import counterReducer from '../features/counter/counterSlice';
+import appReducer from '../features/appSlice';
 
-export const store = configureStore({
+const composeEnhancers = (typeof window !== 'undefined' && window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__);
+const store = configureStore({
   reducer: {
-    counter: counterReducer,
+    app: appReducer,
   },
+  enhancer:{
+    composeEnhancers
+  }
+  
 });
+
+export default store;
+
