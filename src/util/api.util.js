@@ -111,6 +111,27 @@ class Api {
     }
   }
 
+  async pinMessage(payload){
+
+    try {
+      let req = await this.api.post('/channel/pinmessage', payload)
+      return req
+    } catch (error) {
+      throw error
+    }
+
+  }
+
+  async getPinnedMessages(channelId){
+    try { 
+      let req = await this.api.get(`/channels/getpinnedmessages/${channelId}`);
+      return req
+    } catch (error) {
+      throw error
+    }
+
+  }
+
   
 }
 

@@ -29,6 +29,18 @@ function Message({ message, timestamp, user, userImage, id, channelId, channelNa
       }
   }
 
+  const handlePinClick = async (e)=>{
+    const payload = {channelId: channelId, messageFirebaseId: id, message: message, messageOwner: user}
+
+    try{
+      let req = await Api.pinMessage(payload);
+
+    }catch(err){
+      console.log(err)
+    }
+
+  }
+
 
 
   return (
@@ -51,7 +63,7 @@ function Message({ message, timestamp, user, userImage, id, channelId, channelNa
             <BookmarkBorderIcon onClick={(e)=>handleBookmarkClick(e)}/>
             <FavoriteBorderIcon />
 
-            <LabelImportantIcon />
+            <LabelImportantIcon onClick={(e)=> handlePinClick(e)}/>
           </MessageIconsContainer>
         )}
       </MessageRightContainer>
