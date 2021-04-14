@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import StarOutlineIcon from "@material-ui/icons/StarOutline";
 import InfoOutlinedIcon from "@material-ui/icons/InfoOutlined";
@@ -9,10 +9,15 @@ import { auth, db } from "../../firebase";
 import { useCollection, useDocument } from "react-firebase-hooks/firestore";
 import Message from "../Message";
 import { useAuthState } from "react-firebase-hooks/auth";
+import Api from "../../util/api.util";
+import RoomDetails from "../RoomDetails";
 
 function Chat() {
   const chatBottomRef = useRef(null);
   const [user] = useAuthState(auth);
+
+  const [displayDetails, setDisplayDetails] = useState(false);
+  const [pinnedMessages, setPinnedMessages] = useState([]);
 
   const roomId = useSelector(selectRoomId);
   const [roomDetails] = useDocument(
@@ -27,6 +32,18 @@ function Chat() {
         .orderBy("timestamp", "asc")
   );
 
+  const handleDetailsClick = async (e) => {
+    try {
+      if (roomId) {
+        let req = await Api.getPinnedMessages(roomId);
+        let messageIds = req.data.messageFirebaseIds;
+        setPinnedMessages(messageIds)
+        setDisplayDetails(true);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   useEffect(() => {
     chatBottomRef?.current?.scrollIntoView({
@@ -44,32 +61,39 @@ function Chat() {
               <StarOutlineIcon />
             </HeaderLeft>
 
-            <HeaderRight>
+            <HeaderRight onClick={(e) => handleDetailsClick(e)}>
               <p>
                 <InfoOutlinedIcon /> Details
               </p>
             </HeaderRight>
           </Header>
 
-          <ChatMessages>
-            {roomMessages?.docs.map((doc) => {
-              const { message, timestamp, user, userImage } = doc.data();
-              return (
-                <Message
-                  key={doc.id}
-                  id={doc.id}
-                  message={message}
-                  user={user}
-                  timestamp={timestamp}
-                  userImage={userImage}
-                  channelId={roomId}
-                  channelName={roomDetails?.data().name}
-                />
-              );
-            })}
+          {!displayDetails && (
+            <>
+              <ChatMessages>
+                {roomMessages?.docs.map((doc) => {
+                  const { message, timestamp, user, userImage } = doc.data();
+                  return (
+                    <Message
+                      key={doc.id}
+                      id={doc.id}
+                      message={message}
+                      user={user}
+                      timestamp={timestamp}
+                      userImage={userImage}
+                      channelId={roomId}
+                      channelName={roomDetails?.data().name}
+                    />
+                  );
+                })}
 
-            <ChatBottom ref={chatBottomRef} />
-          </ChatMessages>
+                <ChatBottom ref={chatBottomRef} />
+              </ChatMessages>
+            </>
+          )}
+          {displayDetails && (
+            <RoomDetails messageIds={pinnedMessages} />
+          )}
 
           <ChatInput
             chatBottomRef={chatBottomRef}
@@ -89,6 +113,9 @@ const Header = styled.div`
   justify-content: space-between;
   padding: 20px;
   border-bottom: 1px solid lightgray;
+  position: fixed;
+  background-color: white;
+  width: 80%;
 `;
 
 const HeaderLeft = styled.div`
@@ -110,10 +137,18 @@ const HeaderLeft = styled.div`
 const HeaderRight = styled.div`
   display: flex;
   align-items: center;
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 2px solid darkgray;
+  :hover {
+    opacity: 0.8;
+    cursor: pointer;
+  }
   > p {
     display: flex;
     align-items: center;
     font-size: 14px;
+    color: black;
   }
 
   > p > .MuiSvgIcon-root {
@@ -129,7 +164,9 @@ const ChatContainer = styled.div`
   margin-top: 60px;
 `;
 
-const ChatMessages = styled.div``;
+const ChatMessages = styled.div`
+  margin-top: 70px;
+`;
 
 const ChatBottom = styled.div`
   padding-bottom: 200px;
