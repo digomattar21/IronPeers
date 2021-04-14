@@ -2,6 +2,7 @@ import { Button } from "@material-ui/core";
 import React from "react";
 import styled from "styled-components";
 import { auth, provider } from "../../firebase";
+import Api from '../../util/api.util'
 
 
 function Login() {
@@ -13,7 +14,9 @@ function Login() {
         try{
             let signin = await auth.signInWithPopup(provider);
             console.log(signin)
-
+            let payload={username: signin.user.displayName, email: signin.user.email, profilePic:signin.user.photoURL}
+            console.log(payload)
+            let apiReq = await Api.signUpWithGoogle(payload)
        }catch(errr){
            console.log(errr)
        }
