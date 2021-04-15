@@ -1,56 +1,66 @@
+import { useHistory, useParams } from "react-router-dom";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { useCollection, useDocument } from "react-firebase-hooks/firestore";
 import React, { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
+
 import StarOutlineIcon from "@material-ui/icons/StarOutline";
 import InfoOutlinedIcon from "@material-ui/icons/InfoOutlined";
+import CloseIcon from "@material-ui/icons/Close";
+
 import { useSelector } from "react-redux";
 import ChatInput from "../ChatInput";
 import { selectRoomId } from "../../features/appSlice";
 import { auth, db } from "../../firebase";
-import { useCollection, useDocument } from "react-firebase-hooks/firestore";
 import Message from "../Message";
-import { useAuthState } from "react-firebase-hooks/auth";
 import Api from "../../util/api.util";
 import RoomDetails from "../RoomDetails";
 
-function Chat() {
+function Channel({}) {
   const chatBottomRef = useRef(null);
+  const { channelId } = useParams();
   const [user] = useAuthState(auth);
-
   const [displayDetails, setDisplayDetails] = useState(false);
   const [pinnedMessages, setPinnedMessages] = useState([]);
+  const [buttonForExit, setButtonForExit] = useState(false);
 
-  const roomId = useSelector(selectRoomId);
   const [roomDetails] = useDocument(
-    roomId && db.collection("rooms").doc(roomId)
+    channelId && db.collection("rooms").doc(channelId)
   );
+
   const [roomMessages, loading] = useCollection(
-    roomId &&
+    channelId &&
       db
         .collection("rooms")
-        .doc(roomId)
+        .doc(channelId)
         .collection("messages")
         .orderBy("timestamp", "asc")
   );
 
   const handleDetailsClick = async (e) => {
     try {
-      if (roomId) {
-        let req = await Api.getPinnedMessages(roomId);
+      if (channelId) {
+        let req = await Api.getPinnedMessages(channelId);
         let messageIds = req.data.messageFirebaseIds;
-        setPinnedMessages(messageIds)
+        setPinnedMessages(messageIds);
         setDisplayDetails(true);
+        setButtonForExit(true);
       }
     } catch (error) {
       console.log(error);
     }
   };
 
+  const handleExitDetailsClick = (e) => {
+    setButtonForExit(false);
+    setDisplayDetails(false);
+  };
 
   useEffect(() => {
     chatBottomRef?.current?.scrollIntoView({
       behavior: "smooth",
     });
-  }, [roomId, loading]);
+  }, [channelId, loading]);
 
   return (
     <ChatContainer>
@@ -62,14 +72,19 @@ function Chat() {
               <StarOutlineIcon />
             </HeaderLeft>
 
-            <HeaderRight onClick={(e) => handleDetailsClick(e)}>
-              <p>
-                <InfoOutlinedIcon /> Details
-              </p>
+            <HeaderRight>
+              {buttonForExit == false && (
+                <div onClick={handleDetailsClick}>
+                  <InfoOutlinedIcon /> Details
+                </div>
+              )}
+              {buttonForExit ==true && (
+                <CloseIcon onClick={handleExitDetailsClick}/>
+              )}
             </HeaderRight>
           </Header>
 
-          {!displayDetails && (
+          {displayDetails==false && (
             <>
               <ChatMessages>
                 {roomMessages?.docs.map((doc) => {
@@ -82,7 +97,7 @@ function Chat() {
                       user={user}
                       timestamp={timestamp}
                       userImage={userImage}
-                      channelId={roomId}
+                      channelId={channelId}
                       channelName={roomDetails?.data().name}
                     />
                   );
@@ -93,12 +108,12 @@ function Chat() {
             </>
           )}
           {displayDetails && (
-            <RoomDetails messageIds={pinnedMessages} channelId={roomId} />
+            <RoomDetails messageIds={pinnedMessages} channelId={channelId} />
           )}
 
           <ChatInput
             chatBottomRef={chatBottomRef}
-            channelId={roomId}
+            channelId={channelId}
             channelName={roomDetails?.data().name}
           />
         </>
@@ -107,7 +122,7 @@ function Chat() {
   );
 }
 
-export default Chat;
+export default Channel;
 
 const Header = styled.div`
   display: flex;
@@ -145,7 +160,7 @@ const HeaderRight = styled.div`
     opacity: 0.8;
     cursor: pointer;
   }
-  > p {
+  > div {
     display: flex;
     align-items: center;
     font-size: 14px;

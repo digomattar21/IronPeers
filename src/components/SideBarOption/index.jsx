@@ -32,12 +32,12 @@ function SideBarOption({ Icon, title, addChannel, setAddChannelInputBool, addCha
   };
 
   const handleSelectChannel = () => {
-     if (id){
-       dispatch(
-         enterRoom({
-          roomId: id
-       }))
-     }
+    //  if (id){
+    //    dispatch(
+    //      enterRoom({
+    //       roomId: id
+    //    }))
+    //  }
   };
 
   return (
