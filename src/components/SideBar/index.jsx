@@ -1,6 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
 import styled from "styled-components";
-
 import FiberManualRecordIcon from "@material-ui/icons/FiberManualRecord";
 import CreateIcon from "@material-ui/icons/Create";
 import SideBarOption from "../SideBarOption";
@@ -19,15 +18,31 @@ import { auth, db } from "../../firebase";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { Link } from "@material-ui/core";
 import AuthContext from '../../context/UserProvider/context';
+import Api from '../../util/api.util'
 
 function SideBar() {
   const [addChannelInputBool, setAddChannelInputBool] = useState(false);
+  const [message, setMessage] = useState(null)
   const [channels, loading, error ] = useCollection(db.collection("rooms"));
   const [user] = useAuthState(auth);
   const {userAuth, changeUserAuth} = useContext(AuthContext);
+  const [username, setUsername] = useState(null); 
+
+  const getUserInfo=async()=>{
+    try {
+      let req = await Api.getUserInfo();
+      console.log(req)
+      setUsername(req.data.userAuth.username)
+
+      
+    } catch (error) {
+      setMessage(error);
+      changeUserAuth(false)
+    }
+  }
 
   useEffect(()=>{
-    console.log(userAuth)
+    (!user && getUserInfo())
    } ,[])
 
   return (
@@ -37,7 +52,8 @@ function SideBar() {
           <h2>{"IronDump".toUpperCase()}</h2>
           <h3>
             <FiberManualRecordIcon />
-            {user?.displayName}
+            {(user?.displayName || username)}
+            {message && <h5>{message}</h5>}
           </h3>
         </SideBarInfo>
         <CreateIcon />

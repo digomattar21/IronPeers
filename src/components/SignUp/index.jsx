@@ -47,6 +47,7 @@ function SignUp() {
 
       }catch(err){
         console.log(err)
+        setMessage(err)
       }
         
         
