@@ -44,7 +44,6 @@ function SignUp() {
         console.log(req)
         setSignUpState(false)
         setConfirmState(true)
-        changeUserAuth(true)
 
       }catch(err){
         console.log(err)

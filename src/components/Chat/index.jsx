@@ -44,7 +44,6 @@ function Chat() {
       console.log(error);
     }
   };
-  
   useEffect(() => {
     chatBottomRef?.current?.scrollIntoView({
       behavior: "smooth",

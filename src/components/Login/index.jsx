@@ -1,14 +1,16 @@
 import { Button, TextField } from "@material-ui/core";
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import styled from "styled-components";
+import AuthContext from '../../context/UserProvider/context';
 import { auth, provider } from "../../firebase";
 import Api from "../../util/api.util";
 import SignUp from '../SignUp';
 
 function Login() {
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [loginState, setLoginState] = useState(true)
+  const [loginState, setLoginState] = useState(true);
+  const {userAuth, changeUserAuth} = useContext(AuthContext);
 
   const handleGoogleSignInClick = async (e) => {
     e.preventDefault();
@@ -29,17 +31,25 @@ function Login() {
   };
 
   const handleLoginSubmit = async (e)=>{
+    e.preventDefault();
+    let payload = {email: email, password: password };
+      try{
+        let req = await Api.login(payload);
+        console.log(req)
+        changeUserAuth(true)
+
+      }catch(err){
+        console.log(err)
+      }
 
   }
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    if (name === "username") {
-      setUsername(value);
-      console.log(name);
+    if (name === "email") {
+      setEmail(value);
     } else {
       setPassword(value);
-      console.log(password);
     }
   };
 
@@ -88,7 +98,7 @@ function Login() {
               id="input"
               label="email"
               variant="outlined"
-              name="username"
+              name="email"
               onChange={(e) => handleChange(e)}
               className='input'
             />

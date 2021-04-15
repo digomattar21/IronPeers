@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import styled from "styled-components";
 
 import FiberManualRecordIcon from "@material-ui/icons/FiberManualRecord";
@@ -18,12 +18,17 @@ import {useCollection} from 'react-firebase-hooks/firestore';
 import { auth, db } from "../../firebase";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { Link } from "@material-ui/core";
+import AuthContext from '../../context/UserProvider/context';
 
 function SideBar() {
   const [addChannelInputBool, setAddChannelInputBool] = useState(false);
   const [channels, loading, error ] = useCollection(db.collection("rooms"));
-  const [user] = useAuthState(auth)
+  const [user] = useAuthState(auth);
+  const {userAuth, changeUserAuth} = useContext(AuthContext);
 
+  useEffect(()=>{
+    console.log(userAuth)
+   } ,[])
 
   return (
     <SideBarContainer>
