@@ -103,15 +103,11 @@ const ConfirmFormContainer = styled.div`
     background-color: var(--ironblue-color) !important;
     padding: 5px 10px;
   }
+  
   > form {
     display: flex;
     flex-direction: column;
-    margin-top: 30px
-  }
-  > form {
-    display: flex;
-    flex-direction: column;
-    margin-top: 10px;
+    margin-top: 0px;
     > Button {
     color: white;
     font-size: 15px;
@@ -120,9 +116,10 @@ const ConfirmFormContainer = styled.div`
     background-color: var(--ironblue-color) !important;
     padding: 5px 10px;
   }
+  }
 
     .input{
-      margin-top: 15px;
+      margin-top: 0px;
       margin-bottom: 15px;
     }
 
@@ -144,12 +141,14 @@ const ConfirmInsideContainer = styled.div`
   > h1 > span {
     color: #2aaee4;
   }
-  
 
   > Button:hover {
     color: black;
   }
-  ..Mui-SvgIcon-root{
+
+  .MuiSvgIcon-root{
+    margin-top:20px;
+    font-size: 100px;
     color: var(--ironblue-color);
   }
 `;

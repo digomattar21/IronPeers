@@ -44,6 +44,8 @@ function Chat() {
       console.log(error);
     }
   };
+
+
   useEffect(() => {
     chatBottomRef?.current?.scrollIntoView({
       behavior: "smooth",
@@ -91,7 +93,7 @@ function Chat() {
             </>
           )}
           {displayDetails && (
-            <RoomDetails messageIds={pinnedMessages} />
+            <RoomDetails messageIds={pinnedMessages} channelId={roomId} />
           )}
 
           <ChatInput
