@@ -1,33 +1,52 @@
-import { Button } from "@material-ui/core";
-import React from "react";
+import { Button, TextField } from "@material-ui/core";
+import React, { useState } from "react";
 import styled from "styled-components";
 import { auth, provider } from "../../firebase";
-import Api from '../../util/api.util'
-
+import Api from "../../util/api.util";
+import SignUp from '../SignUp';
 
 function Login() {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [loginState, setLoginState] = useState(true)
 
+  const handleGoogleSignInClick = async (e) => {
+    e.preventDefault();
+    try {
+      let signin = await auth.signInWithPopup(provider);
+      console.log(signin);
+      let payload = {
+        username: signin.user.displayName,
+        email: signin.user.email,
+        profilePic: signin.user.photoURL,
+      };
+      console.log(payload);
+      let apiReq = await Api.signUpWithGoogle(payload);
+      console.log(apiReq);
+    } catch (errr) {
+      console.log(errr);
+    }
+  };
 
+  const handleLoginSubmit = async (e)=>{
 
-    const handleGoogleSignInClick = async (e) => {
-        e.preventDefault();
-        try{
-            let signin = await auth.signInWithPopup(provider);
-            console.log(signin);
-            let payload={username: signin.user.displayName, email: signin.user.email, profilePic:signin.user.photoURL};
-            console.log(payload);
-            let apiReq = await Api.signUpWithGoogle(payload);
-            console.log(apiReq);
-       }catch(errr){
-           console.log(errr)
-       }
+  }
 
-
-    }   
-
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    if (name === "username") {
+      setUsername(value);
+      console.log(name);
+    } else {
+      setPassword(value);
+      console.log(password);
+    }
+  };
 
   return (
-    <LoginContainer>
+    <>
+    {loginState==true && (
+      <LoginContainer>
       <LoginInsideContainer>
         <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
           <g id="Atom / Icon / Logo / Ironhack / M (32px)">
@@ -56,16 +75,50 @@ function Login() {
             </g>
           </g>
         </svg>
-        <h1>Sign-in to <span>Iron Peers</span></h1>
+        <h1>
+          Sign-in to <span>Iron Peers</span>
+        </h1>
         <p>ironhack.com</p>
+        <LoginFormContainer>
+        <Button className="signingooglebtn" variant='contained' onClick={(e) => handleGoogleSignInClick(e)}>
+          Sign in with Google
+        </Button>
+          <form onSubmit={(e)=>handleLoginSubmit(e)}>
+            <TextField
+              id="input"
+              label="email"
+              variant="outlined"
+              name="username"
+              onChange={(e) => handleChange(e)}
+              className='input'
+            />
+            <TextField
+              id="outlined-basic"
+              name="password"
+              label="password"
+              variant="outlined"
+              onChange={(e) => handleChange(e)}
+              className='input'
+            />
+            <Button type="submit" variant="contained">
+                  Submit
+            </Button>
+          </form>
+        </LoginFormContainer>
 
-        <Button onClick={(e)=>handleGoogleSignInClick(e)}>
-        Sign in with Google
-    </Button>
+        <SignUpTextContainer onClick={()=>setLoginState(false)}>
+          New to IronPeers? SignUp
+        </SignUpTextContainer>
+
+        
       </LoginInsideContainer>
-
-    
     </LoginContainer>
+    )}
+    {loginState==false &&(
+      <SignUp />
+    )}
+    </>
+    
   );
 }
 
@@ -78,31 +131,68 @@ const LoginContainer = styled.div`
   place-items: center;
 `;
 
+const LoginFormContainer = styled.div`
+> Button {
+    color: white;
+    margin-top: 20px;
+    font-size: 15px;
+    font-weight: 300;
+    text-transform: inherit !important;
+    background-color: var(--ironblue-color) !important;
+    padding: 5px 10px;
+  }
+  > form {
+    display: flex;
+    flex-direction: column;
+    margin-top: 30px
+  }
+  > form {
+    display: flex;
+    flex-direction: column;
+    margin-top: 10px;
+    > Button {
+    color: white;
+    font-size: 15px;
+    font-weight: 300;
+    text-transform: inherit !important;
+    background-color: var(--ironblue-color) !important;
+    padding: 5px 10px;
+  }
+
+    .input{
+      margin-top: 15px;
+      margin-bottom: 15px;
+    }
+
+`;
+
+const SignUpTextContainer = styled.h4`
+  margin-top: 20px;
+  color: var(--ironblue-color);
+  :hover{
+    opacity:0.8;
+    cursor: pointer;
+  }
+`;
+
 const LoginInsideContainer = styled.div`
-    padding: 100px;
-    text-align:center;
-    background-color: white;
-    border-radius: 10px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+  padding: 100px;
+  text-align: center;
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
 
   > svg {
     object-fit: contain;
     height: 100px;
     margin-bottom: 40px;
   }
-  >h1>span{
-      color: #2aaee4;
+  > h1 > span {
+    color: #2aaee4;
   }
-  >Button{
-      color: white;
-      margin-top: 50px;
-      text-transform: inherit !important;
-      background-color: var(--ironblue-color) !important;
-      padding: 5px 10px;
-      margin-bottom: 50px;
-  }
+  
 
-  >Button:hover{
-      color: black
+  > Button:hover {
+    color: black;
   }
 `;
