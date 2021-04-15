@@ -31,12 +31,31 @@ class Api {
     );
   }
 
-  async login(){
-
+  async login(payload){
+    try {
+      let request  = await this.api.post('/auth/login', payload);
+      console.log('req', request);
+      localStorage.setItem('token', request.data.token);
+      return request
+    } catch (error) {
+      console.log(error);
+    }
   }
 
-  async signup(){
+  async signup(payload){
+    let request = await this.api.post('/auth/signup', payload);
+    console.log(request)
+    localStorage.setItem('token', request.data.token);
+    return request.data.token;
+  }
 
+  async confirmCode(payload) {
+    try {
+      let req = await this.api.post('/auth/confirm', payload);
+      return req;
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   async signout(){
