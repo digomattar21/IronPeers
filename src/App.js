@@ -4,7 +4,6 @@ import "./App.css";
 import Header from "./components/Header";
 import styled from "styled-components";
 import SideBar from "./components/SideBar";
-import Chat from "./components/Chat";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "./firebase";
 import HomeScreen from "./components/HomeScreen";
@@ -15,6 +14,8 @@ import Loading from "./components/Loading";
 import AuthContext from "./context/UserProvider/context";
 import UserInfoContext from "./context/UserInfoProvider/context";
 import Api from "./util/api.util";
+import Channel from "./components/Channel";
+import Threads from "./components/Threads";
 
 function App() {
   const [user, loading] = useAuthState(auth);
@@ -56,10 +57,13 @@ function App() {
                   <SideBar />
                   <Switch>
                     <Route exact path="/">
-                      <Chat />
+                      <Threads />
                     </Route>
                     <Route exact path="/bookmarks">
                       <BookMarkedList />
+                    </Route>
+                    <Route  path="/channel/:channelId" exact >
+                      <Channel />
                     </Route>
                   </Switch>
                 </AppBody>

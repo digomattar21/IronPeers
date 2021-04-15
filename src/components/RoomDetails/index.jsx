@@ -25,13 +25,8 @@ function RoomDetails({ messageIds,channelId }) {
             }).catch((err=>console.log(err)))
           });
           
-          
-         
           setMessagesArray(newArray)
-          console.log(messagesArray)
-          
-
-
+          console.log(messagesArray) 
       }
 
     } catch (error) {

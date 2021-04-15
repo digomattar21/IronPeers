@@ -13,37 +13,35 @@ import FileCopyIcon from "@material-ui/icons/FileCopy";
 import ExpandLessIcon from "@material-ui/icons/ExpandLess";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import AddIcon from "@material-ui/icons/Add";
-import {useCollection} from 'react-firebase-hooks/firestore';
+import { useCollection } from "react-firebase-hooks/firestore";
 import { auth, db } from "../../firebase";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { Link } from "@material-ui/core";
-import AuthContext from '../../context/UserProvider/context';
-import Api from '../../util/api.util'
+import AuthContext from "../../context/UserProvider/context";
+import Api from "../../util/api.util";
 
 function SideBar() {
   const [addChannelInputBool, setAddChannelInputBool] = useState(false);
-  const [message, setMessage] = useState(null)
-  const [channels, loading, error ] = useCollection(db.collection("rooms"));
+  const [message, setMessage] = useState(null);
+  const [channels, loading, error] = useCollection(db.collection("rooms"));
   const [user] = useAuthState(auth);
-  const {userAuth, changeUserAuth} = useContext(AuthContext);
-  const [username, setUsername] = useState(null); 
+  const { userAuth, changeUserAuth } = useContext(AuthContext);
+  const [username, setUsername] = useState(null);
 
-  const getUserInfo=async()=>{
+  const getUserInfo = async () => {
     try {
       let req = await Api.getUserInfo();
-      console.log(req)
-      setUsername(req.data.userAuth.username)
-
-      
+      console.log(req);
+      setUsername(req.data.userAuth.username);
     } catch (error) {
       setMessage(error);
-      changeUserAuth(false)
+      changeUserAuth(false);
     }
-  }
+  };
 
-  useEffect(()=>{
-    (!user && getUserInfo())
-   } ,[])
+  useEffect(() => {
+    !user && getUserInfo();
+  }, []);
 
   return (
     <SideBarContainer>
@@ -52,7 +50,7 @@ function SideBar() {
           <h2>{"IronDump".toUpperCase()}</h2>
           <h3>
             <FiberManualRecordIcon />
-            {(user?.displayName || username)}
+            {user?.displayName || username}
             {message && <h5>{message}</h5>}
           </h3>
         </SideBarInfo>
@@ -62,7 +60,7 @@ function SideBar() {
       <SideBarOption Icon={InsertCommentIcon} title="Threads" />
       <SideBarOption Icon={InboxIcon} title="Inbox" />
       <SideBarOption Icon={DraftsIcon} title="Saved" />
-      <a href='/bookmarks'>
+      <a href="/bookmarks">
         <SideBarOption Icon={BookmarkBorderIcon} title="My Bookmarks" />
       </a>
       <SideBarOption Icon={PeopleAltIcon} title="User groups & People" />
@@ -84,10 +82,17 @@ function SideBar() {
         setAddChannelInputBool={setAddChannelInputBool}
       />
 
-      {channels?.docs.map(channel=>{
-        return (<SideBarOption key={channel.id} id={channel.id} title={channel.data().name}/>)
+      {channels?.docs.map((channel) => {
+        return (
+          <Link href={`/channel/${channel.id}`}>
+            <SideBarOption
+              key={channel.id}
+              id={channel.id}
+              title={channel.data().name}
+            />
+          </Link>
+        );
       })}
-
     </SideBarContainer>
   );
 }
