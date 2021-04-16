@@ -10,7 +10,14 @@ import AddToPhotosIcon from '@material-ui/icons/AddToPhotos';
 
 function Threads() {
   const [channels, loading, error] = useCollection(db.collection("rooms"));
+  const [searchValue, setSearchValue] = useState('');
 
+
+  const handleChange = (e) => {
+    if (e.target){
+      setSearchValue(e.target.value);
+    }
+  }
 
   return (
     <ThreadsContainer>
@@ -20,7 +27,7 @@ function Threads() {
 
       <SearchContainer>
         <SearchIcon />
-        <input placeholder="search" />
+        <input placeholder="search" value={searchValue} onChange={(e)=>handleChange(e)} />
       </SearchContainer>
 
       <MidContainer>
@@ -39,7 +46,7 @@ function Threads() {
       </MidContainer>
 
       <ThreadsListContainer>
-        {channels?.docs.map((channel) => {
+        {!searchValue && channels?.docs.map((channel) => {
           return (
             <ThreadCard
               key={channel.id}
@@ -47,6 +54,16 @@ function Threads() {
               title={channel.data().name}
             />
           );
+        })}
+        {searchValue && channels?.docs.map((channel) =>{
+          let title = channel.data().name;
+          return title.toLowerCase().includes(searchValue.toLowerCase())&&(
+            <ThreadCard
+              key={channel.id}
+              id={channel.id}
+              title={channel.data().name}
+            />
+          )
         })}
       </ThreadsListContainer>
 
@@ -74,6 +91,7 @@ const MidLeftContainer = styled.div`
 const MidRightContainer = styled.div`
     >div{
         display: flex;
+        margin-right: 20px;
         align-items: center;
         justify-content: center;
         padding: 2px 6px;

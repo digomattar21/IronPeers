@@ -6,6 +6,7 @@ import { auth } from "../../firebase";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { Redirect } from "react-router";
 import { Link } from "@material-ui/core";
+import StarOutlineIcon from '@material-ui/icons/StarOutline';
 
 function ThreadCard({ id, title }) {
   const [length, setLength] = useState(0);
@@ -15,11 +16,21 @@ function ThreadCard({ id, title }) {
   const getChannelMembersLength = async () => {
     try {
       let req = await Api.getChannelMembersLength(id);
-      setLength(req.data.membersLength.length);
+      setLength(req.data.membersLength);
     } catch (error) {
       console.log(error);
     }
   };
+
+  const handleFavoriteChannelClick = async()=>{
+    const payload = {userEmail: user.email, channelId: id};
+    try {
+      await Api.setFavoriteChannel(payload)
+
+    } catch (err) {
+      console.log(err)
+    }
+  }
 
   const handleJoinChannelClick = async () => {
     let payload = { userEmail: user.email, channelId: id };
@@ -41,18 +52,25 @@ function ThreadCard({ id, title }) {
       <ThreadCardContainer
         onMouseEnter={() => setIconsShow(true)}
         onMouseLeave={() => setIconsShow(false)}
-        onClick={() => handleJoinChannelClick()}
       >
         <div>
-          <h4>#{title}</h4>
+          <div className="titleIconContainer">
+            <h4>#{title}</h4>
+            <StarOutlineIcon onClick={()=>handleFavoriteChannelClick()}/>
+          </div>
           <h6> members : {length}</h6>
         </div>
         {iconsShow && (
+          <div
+          onClick={() => handleJoinChannelClick()}
+
+          >
           <Link href={`/channel/${id}`}>
             <BtnsContainer>
               <ExitToAppIcon />
             </BtnsContainer>
           </Link>
+          </div>
         )}
       </ThreadCardContainer>
     </>
@@ -69,18 +87,35 @@ const ThreadCardContainer = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  > div > h4 {
+  > div > div > h4 {
     color: black;
     font-weight: 500;
     font-size: 15px;
     margin-bottom: 15px;
   }
-  > div > h4:hover {
+  > div >div> h4:hover {
     outline: none;
   }
   > div > h6 {
     color: darkgray;
     margin-bottom: 15px;
+  }
+  .titleIconContainer{
+    display: flex;
+    flex-direction: row;
+    justify-content:flex-start;
+    .MuiSvgIcon-root {
+      margin-left: 5px;
+      font-size: 17px;
+      color: green;
+      :hover{
+        cursor: pointer;
+        transform: scale(1.05);
+        opacity: 0.8;
+
+      }
+    }
+
   }
 `;
 

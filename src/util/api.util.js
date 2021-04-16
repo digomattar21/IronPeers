@@ -194,6 +194,15 @@ class Api {
     }
   }
 
+  async setFavoriteChannel(payload){
+    try {
+      let req = await this.api.post('/user/setfavoritechannel', payload);
+      return req
+    } catch (error) {
+      throw error
+    }
+  }
+
 
 }
 
