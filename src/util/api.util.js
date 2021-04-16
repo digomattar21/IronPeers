@@ -26,8 +26,8 @@ class Api {
             error.response.data.message !== '"Token inválido ou expirado"' &&
             error.response.data.message !== "Token inválido ou expirado" &&
             error.response.data.message !== '"req sem token' &&
-            error.response.data.message !== "req sem token"
-          ) {
+            error.response.data.message !== "req sem token" 
+          ){
             throw JSON.stringify(error.response.data.message);
           }else{
             console.log(error.response.data.message)
@@ -164,6 +164,37 @@ class Api {
       throw error;
     }
   }
+
+  async getChannelMembersLength(channelId){
+    try {
+      let req = await this.api.get(`/channels/getchannelmemberslength/${channelId}`);
+      return req;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  async userJoinChannel(payload){
+    try {
+        let req = await this.api.post('/user/joinchannel', payload);
+        console.log(req);
+        return req
+
+    } catch (error) {
+      throw error
+    }
+  }
+
+  async getUserChannels(payload){
+    try {
+      let req = await this.api.post('/user/getuserchannels',payload)
+      return req
+    } catch (error) {
+      throw error
+    }
+  }
+
+
 }
 
 export default new Api();

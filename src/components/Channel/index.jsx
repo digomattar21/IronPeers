@@ -16,7 +16,7 @@ import Message from "../Message";
 import Api from "../../util/api.util";
 import RoomDetails from "../RoomDetails";
 
-function Channel({}) {
+function Channel(props) {
   const chatBottomRef = useRef(null);
   const { channelId } = useParams();
   const [user] = useAuthState(auth);
@@ -63,7 +63,7 @@ function Channel({}) {
   }, [channelId, loading]);
 
   return (
-    <ChatContainer>
+    <ChannelContainer>
       {roomDetails && roomMessages && (
         <>
           <Header>
@@ -118,7 +118,7 @@ function Channel({}) {
           />
         </>
       )}
-    </ChatContainer>
+    </ChannelContainer>
   );
 }
 
@@ -173,7 +173,7 @@ const HeaderRight = styled.div`
   }
 `;
 
-const ChatContainer = styled.div`
+const ChannelContainer = styled.div`
   flex: 0.7;
   flex-grow: 1;
   overflow-y: scroll;

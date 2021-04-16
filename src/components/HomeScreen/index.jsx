@@ -1,5 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import styled from 'styled-components'
+import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 
 function HomeScreen() {
   return (
@@ -11,3 +13,6 @@ function HomeScreen() {
 }
 
 export default HomeScreen;
+
+
+
