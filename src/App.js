@@ -56,15 +56,9 @@ function App() {
                 <AppBody>
                   <SideBar />
                   <Switch>
-                    <Route exact path="/">
-                      <Threads />
-                    </Route>
-                    <Route exact path="/bookmarks">
-                      <BookMarkedList />
-                    </Route>
-                    <Route  path="/channel/:channelId" exact >
-                      <Channel />
-                    </Route>
+                    <Route exact path="/" component={Threads}/>
+                    <Route exact path="/bookmarks" component={BookMarkedList}/>
+                    <Route path="/channel/:channelId" exact component={Channel}/>
                   </Switch>
                 </AppBody>
               </>
