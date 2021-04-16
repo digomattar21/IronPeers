@@ -51,6 +51,16 @@ function Channel(props) {
     }
   };
 
+  const handleFavoriteChannelClick = async()=>{
+    const payload = {userEmail: user.email, channelId: channelId};
+    try {
+     await Api.setFavoriteChannel(payload)
+
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
   const handleExitDetailsClick = (e) => {
     setButtonForExit(false);
     setDisplayDetails(false);
@@ -69,7 +79,7 @@ function Channel(props) {
           <Header>
             <HeaderLeft>
               <h4>#{roomDetails?.data().name}</h4>
-              <StarOutlineIcon />
+              <StarOutlineIcon onClick={()=>handleFavoriteChannelClick()}/>
             </HeaderLeft>
 
             <HeaderRight>
@@ -144,9 +154,15 @@ const HeaderLeft = styled.div`
     margin-right: 5px;
   }
 
-  > h4 > .MuiSvgIcon-root {
-    margin-left: 10px;
-    font-size: 18px;
+  > .MuiSvgIcon-root {
+    margin-left: 1px;
+    font-size: 20px;
+    color: green;
+    :hover{
+      cursor: pointer;
+      transform: scale(1.05);
+      opacity: 0.8;
+    }
   }
 `;
 
@@ -177,7 +193,7 @@ const ChannelContainer = styled.div`
   flex: 0.7;
   flex-grow: 1;
   overflow-y: scroll;
-  margin-top: 60px;
+  margin-top: 48px;
 `;
 
 const ChatMessages = styled.div`

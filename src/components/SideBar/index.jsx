@@ -10,7 +10,7 @@ import BookmarkBorderIcon from "@material-ui/icons/BookmarkBorder";
 import PeopleAltIcon from "@material-ui/icons/PeopleAlt";
 import AppsIcon from "@material-ui/icons/Apps";
 import FileCopyIcon from "@material-ui/icons/FileCopy";
-import StarBorderIcon from '@material-ui/icons/StarBorder';
+import StarBorderIcon from "@material-ui/icons/StarBorder";
 import ExpandLessIcon from "@material-ui/icons/ExpandLess";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import AddIcon from "@material-ui/icons/Add";
@@ -54,6 +54,10 @@ function SideBar(props) {
     }
   };
 
+  const handleShowChannelsClick = () =>{
+    setShowChannels(!showChannels)
+  }
+
   useEffect(() => {
     !user && getUserInfo();
     getUserChannels();
@@ -74,7 +78,7 @@ function SideBar(props) {
       </SideBarHeader>
 
       <Link href="/">
-        <SideBarOption Icon={InsertCommentIcon} title="Threads" />
+        <SideBarOption Icon={InsertCommentIcon} title="Community Threads" />
       </Link>
       <SideBarOption Icon={InboxIcon} title="Inbox" />
       <SideBarOption Icon={DraftsIcon} title="Saved" />
@@ -82,15 +86,10 @@ function SideBar(props) {
         <SideBarOption Icon={BookmarkBorderIcon} title="My Bookmarks" />
       </a>
       <SideBarOption Icon={PeopleAltIcon} title="User groups & People" />
-      <SideBarOption Icon={AppsIcon} title="Apps" />
+      {/* <SideBarOption Icon={AppsIcon} title="Apps" /> */}
       <SideBarOption Icon={FileCopyIcon} title="Files" />
-      <SideBarOption Icon={ExpandLessIcon} title="Show Less" />
 
-      <hr />
-
-      <SideBarOption Icon={ExpandMoreIcon} title="Channels" />
-
-      <hr />
+      <hr/>
 
       <SideBarOption
         Icon={AddIcon}
@@ -100,9 +99,36 @@ function SideBar(props) {
         setAddChannelInputBool={setAddChannelInputBool}
       />
       <hr />
-      <SideBarOption Icon={ExpandMoreIcon} title="Joined Channels" />
 
-      {joinedChannels.length > 0 &&
+      <SideBarOption Icon={StarBorderIcon} title="Favorite Channels" />
+
+      {favoriteChannels.length > 0 &&
+        favoriteChannels.map((channel) => {
+          return (
+            <Link href={`/channel/${channel.firebaseId}`}>
+              <SideBarOption
+                key={channel.firebaseId}
+                id={channel.firebaseId}
+                title={channel.name}
+              />
+            </Link>
+          );
+        })}
+
+
+      {showChannels && (
+        <div onClick={()=>handleShowChannelsClick()}>
+        <SideBarOption Icon={ExpandLessIcon} title="Joined Channels" />
+        </div>
+      )}
+
+      {!showChannels && (
+        <div onClick={()=>handleShowChannelsClick()}>
+        <SideBarOption Icon={ExpandMoreIcon} title="Joined Channels" />
+        </div>
+      )}
+
+      {(joinedChannels.length > 0 && showChannels) &&
         joinedChannels.map((channel) => {
           return (
             <Link href={`/channel/${channel.firebaseId}`}>
@@ -115,24 +141,7 @@ function SideBar(props) {
           );
         })}
 
-        <>
-          <SideBarOption Icon={StarBorderIcon} title="Favorite Channels" />
-          
-        </>
-
-      {favoriteChannels.length > 0 && (
-        favoriteChannels.map((channel)=>{
-          return(
-            <Link href={`/channel/${channel.firebaseId}`}>
-              <SideBarOption
-                key={channel.firebaseId}
-                id={channel.firebaseId}
-                title={channel.name}
-              />
-            </Link>
-          )
-        })
-      )}
+      
     </SideBarContainer>
   );
 }
