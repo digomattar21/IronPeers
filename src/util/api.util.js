@@ -99,6 +99,24 @@ class Api {
     }
   }
 
+  async addPrivateChannel(payload) {
+    try {
+      let req = await this.api.post("/channels/createprivate", payload);
+      return req
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async getPrivateChannelPinnedMessages(channelId) {
+    try {
+      let req = await this.api.get(`/channels/private/getpinnedmessages/${channelId}`);
+      return req;
+    } catch (error) {
+      throw error;
+    }
+  }
+
   async bookMarkMessage(payload) {
     try {
       let req = await this.api.post("/channels/bookmarkmessage", payload);
@@ -107,6 +125,16 @@ class Api {
       throw error;
     }
   }
+
+  async bookMarkMessage(payload) {
+    try {
+      let req = await this.api.post("/channels/private/bookmarkmessage", payload);
+      return req;
+    } catch (error) {
+      throw error;
+    }
+  }
+
 
   async getChannelBookMarkedMessages(channelId) {
     try {
@@ -155,6 +183,15 @@ class Api {
       throw error;
     }
   }
+  async pinPrivateMessage(payload) {
+    try {
+      let req = await this.api.post("/channel/private/pinmessage", payload);
+      return req;
+    } catch (error) {
+      throw error;
+    }
+  }
+  
 
   async getPinnedMessages(channelId) {
     try {

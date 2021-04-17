@@ -4,20 +4,29 @@ import ExitToAppIcon from "@material-ui/icons/ExitToApp";
 import { useCollection } from "react-firebase-hooks/firestore";
 import { auth, db } from "../../firebase";
 import SearchIcon from "@material-ui/icons/Search";
-import { Link } from "@material-ui/core";
+import { Button, Link, Modal, Switch, TextField } from "@material-ui/core";
 import ThreadCard from "../ThreadCard";
-import AddToPhotosIcon from '@material-ui/icons/AddToPhotos';
+import AddToPhotosIcon from "@material-ui/icons/AddToPhotos";
+import Backdrop from "@material-ui/core/Backdrop";
+import Fade from "@material-ui/core/Fade";
+import CreateChannelModal from "../CreateChannelModal";
 
 function Threads() {
   const [channels, loading, error] = useCollection(db.collection("rooms"));
-  const [searchValue, setSearchValue] = useState('');
-
+  const [searchValue, setSearchValue] = useState("");
+  const [open, setOpen] = useState(false);
 
   const handleChange = (e) => {
     if (e.target){
-      setSearchValue(e.target.value);
+      setSearchValue(e.target.value)
     }
   }
+
+
+  const handleOpen = () => {
+    setOpen(true);
+  };
+
 
   return (
     <ThreadsContainer>
@@ -27,44 +36,52 @@ function Threads() {
 
       <SearchContainer>
         <SearchIcon />
-        <input placeholder="search" value={searchValue} onChange={(e)=>handleChange(e)} />
+        <input
+          placeholder="search"
+          value={searchValue}
+          onChange={(e) => handleChange(e)}
+        />
       </SearchContainer>
 
       <MidContainer>
-      <MidLeftContainer>
+        <MidLeftContainer></MidLeftContainer>
 
-      </MidLeftContainer>
+        <MidRightContainer>
+          <ModalContainer>
+            <div onClick={handleOpen}>
+              <h6>Create Channel</h6>
+              <AddToPhotosIcon />
+            </div>
 
-      <MidRightContainer>
-        <div>
-            <h6>Create Channel</h6>
-            <AddToPhotosIcon/>
-        </div>
-
-      </MidRightContainer>
-
+            <CreateChannelModal open={open} setOpen={setOpen}/>
+          </ModalContainer>
+        </MidRightContainer>
       </MidContainer>
 
       <ThreadsListContainer>
-        {!searchValue && channels?.docs.map((channel) => {
-          return (
-            <ThreadCard
-              key={channel.id}
-              id={channel.id}
-              title={channel.data().name}
-            />
-          );
-        })}
-        {searchValue && channels?.docs.map((channel) =>{
-          let title = channel.data().name;
-          return title.toLowerCase().includes(searchValue.toLowerCase())&&(
-            <ThreadCard
-              key={channel.id}
-              id={channel.id}
-              title={channel.data().name}
-            />
-          )
-        })}
+        {!searchValue &&
+          channels?.docs.map((channel) => {
+            return (
+              <ThreadCard
+                key={channel.id}
+                id={channel.id}
+                title={channel.data().name}
+              />
+            );
+          })}
+        {searchValue &&
+          channels?.docs.map((channel) => {
+            let title = channel.data().name;
+            return (
+              title.toLowerCase().includes(searchValue.toLowerCase()) && (
+                <ThreadCard
+                  key={channel.id}
+                  id={channel.id}
+                  title={channel.data().name}
+                />
+              )
+            );
+          })}
       </ThreadsListContainer>
 
       <LowerContainer></LowerContainer>
@@ -73,6 +90,23 @@ function Threads() {
 }
 
 export default Threads;
+
+
+
+const ModalContainer = styled.div`
+  > div {
+    display: flex;
+    align-items: center;
+    > h6 {
+      margin-right: 5px;
+      color: white;
+    }
+
+    > .MuiSvgIcon-root {
+      color: white;
+    }
+  }
+`;
 
 const ThreadsContainer = styled.div`
   flex: 0.7;
@@ -84,45 +118,36 @@ const ThreadsContainer = styled.div`
   align-items: center;
 `;
 
-const MidLeftContainer = styled.div`
 
-`;
+
+const MidLeftContainer = styled.div``;
 
 const MidRightContainer = styled.div`
-    >div{
-        display: flex;
-        margin-right: 20px;
-        align-items: center;
-        justify-content: center;
-        padding: 2px 6px;
-        border: 1px solid green;
-        background-color: green;
-        border-radius: 5px;
-        :hover{
-            opacity: 0.8;
-            cursor:pointer;
-        }
-
-        >h6{
-            margin-right: 5px;
-            color: white;
-        }
-
-        >.MuiSvgIcon-root {
-            color: white;
-        }
+  > div {
+    display: flex;
+    margin-right: 20px;
+    align-items: center;
+    justify-content: center;
+    padding: 2px 6px;
+    border: 1px solid green;
+    background-color: green;
+    border-radius: 5px;
+    :hover {
+      opacity: 0.8;
+      cursor: pointer;
     }
 
+  }
 `;
 
 const MidContainer = styled.div`
-    margin-top:10px;
-    width: 90%;
-    height: 30px;
-    padding-bottom: 10px;
-    border-bottom: 1px solid gray;
-    display: flex;
-    justify-content: space-between;
+  margin-top: 10px;
+  width: 90%;
+  height: 30px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid gray;
+  display: flex;
+  justify-content: space-between;
 `;
 
 const ThreadsListContainer = styled.div``;

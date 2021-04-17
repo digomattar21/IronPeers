@@ -3,11 +3,9 @@ import { useAuthState } from "react-firebase-hooks/auth";
 import { useCollection, useDocument } from "react-firebase-hooks/firestore";
 import React, { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
-
-import StarOutlineIcon from "@material-ui/icons/StarOutline";
 import InfoOutlinedIcon from "@material-ui/icons/InfoOutlined";
 import CloseIcon from "@material-ui/icons/Close";
-
+import LockIcon from "@material-ui/icons/Lock";
 import { useSelector } from "react-redux";
 import ChatInput from "../ChatInput";
 import { selectRoomId } from "../../features/appSlice";
@@ -18,23 +16,23 @@ import RoomDetails from "../RoomDetails";
 import StarIcon from '@material-ui/icons/Star';
 
 
-function Channel() {
+function PrivateChannel() {
   const chatBottomRef = useRef(null);
   const { channelId } = useParams();
   const [user] = useAuthState(auth);
   const [displayDetails, setDisplayDetails] = useState(false);
   const [pinnedMessages, setPinnedMessages] = useState([]);
   const [buttonForExit, setButtonForExit] = useState(false);
-  const [fullStar, setFullStar] = useState(false);
 
   const [roomDetails] = useDocument(
-    channelId && db.collection("rooms").doc(channelId)
+    channelId && db.collection("privaterooms").doc(channelId)
   );
+
 
   const [roomMessages, loading] = useCollection(
     channelId &&
       db
-        .collection("rooms")
+        .collection("privaterooms")
         .doc(channelId)
         .collection("messages")
         .orderBy("timestamp", "asc")
@@ -43,7 +41,7 @@ function Channel() {
   const handleDetailsClick = async (e) => {
     try {
       if (channelId) {
-        let req = await Api.getPinnedMessages(channelId);
+        let req = await Api.getPrivateChannelPinnedMessages(channelId);
         let messageIds = req.data.messageFirebaseIds;
         setPinnedMessages(messageIds);
         setDisplayDetails(true);
@@ -53,17 +51,6 @@ function Channel() {
       console.log(error);
     }
   };
-
-  const handleFavoriteChannelClick = async()=>{
-    const payload = {userEmail: user.email, channelId: channelId};
-    try {
-      setFullStar(true)
-     await Api.setFavoriteChannel(payload)
-
-    } catch (err) {
-      console.log(err)
-    }
-  }
 
   const handleExitDetailsClick = (e) => {
     setButtonForExit(false);
@@ -82,9 +69,8 @@ function Channel() {
         <>
           <Header>
             <HeaderLeft>
-              <h4>#{roomDetails?.data().name}</h4>
-              {!fullStar && (<StarOutlineIcon onClick={()=>handleFavoriteChannelClick()}/>)}
-              {fullStar && (<StarIcon />)}
+                <LockIcon/>
+                <h4 style={{marginLeft:'10px'}}>{roomDetails?.data().name}</h4>
             </HeaderLeft>
 
             <HeaderRight>
@@ -106,6 +92,7 @@ function Channel() {
                   const { message, timestamp, user, userImage } = doc.data();
                   return (
                     <Message
+                      Private={true}
                       key={doc.id}
                       id={doc.id}
                       message={message}
@@ -127,6 +114,7 @@ function Channel() {
           )}
 
           <ChatInput
+            Private={true}
             chatBottomRef={chatBottomRef}
             channelId={channelId}
             channelName={roomDetails?.data().name}
@@ -137,7 +125,7 @@ function Channel() {
   );
 }
 
-export default Channel;
+export default PrivateChannel;
 
 const Header = styled.div`
   display: flex;

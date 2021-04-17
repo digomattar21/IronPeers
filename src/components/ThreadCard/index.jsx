@@ -7,11 +7,13 @@ import { useAuthState } from "react-firebase-hooks/auth";
 import { Redirect } from "react-router";
 import { Link } from "@material-ui/core";
 import StarOutlineIcon from '@material-ui/icons/StarOutline';
+import StarIcon from '@material-ui/icons/Star';
 
 function ThreadCard({ id, title }) {
   const [length, setLength] = useState(0);
   const [iconsShow, setIconsShow] = useState(false);
   const [user] = useAuthState(auth);
+  const [fullStar, setFullStar ] = useState(false)
 
   const getChannelMembersLength = async () => {
     try {
@@ -25,8 +27,11 @@ function ThreadCard({ id, title }) {
   const handleFavoriteChannelClick = async()=>{
     const payload = {userEmail: user.email, channelId: id};
     try {
-      await Api.setFavoriteChannel(payload)
+      setFullStar(true)
+      await Api.setFavoriteChannel(payload);
+      await Api.userJoinChannel(payload);
 
+      return <Redirect to={'/'}/>
     } catch (err) {
       console.log(err)
     }
@@ -56,7 +61,8 @@ function ThreadCard({ id, title }) {
         <div>
           <div className="titleIconContainer">
             <h4>#{title}</h4>
-            <StarOutlineIcon onClick={()=>handleFavoriteChannelClick()}/>
+            {!fullStar && (<StarOutlineIcon onClick={()=>handleFavoriteChannelClick()}/>)}
+            {fullStar && (<StarIcon />)}
           </div>
           <h6> members : {length}</h6>
         </div>
