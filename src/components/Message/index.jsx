@@ -5,43 +5,66 @@ import { auth, db } from "../../firebase";
 import BookmarkBorderIcon from "@material-ui/icons/BookmarkBorder";
 import LabelImportantIcon from "@material-ui/icons/LabelImportant";
 import FavoriteBorderIcon from "@material-ui/icons/FavoriteBorder";
-import { useCollection } from 'react-firebase-hooks/firestore';
-import Api from '../../util/api.util';
+import { useCollection } from "react-firebase-hooks/firestore";
+import Api from "../../util/api.util";
 
-function Message({ message, timestamp, user, userImage, id, channelId, channelName}) {
+function Message({
+  message,
+  timestamp,
+  user,
+  userImage,
+  id,
+  channelId,
+  channelName,
+  Private,
+}) {
   const [userState] = useAuthState(auth);
   const [iconsShow, setIconsShow] = useState(false);
-  
 
-
-  const handleBookmarkClick = async (e)=>{
-      const payload = {channelId: channelId, firebaseId: id, message: message};
-      console.log('user', userState)
-      try {
-        let req = await Api.bookMarkMessage(payload); 
-        if (userState.email){
-          const newPayload = {channelId: channelId, messageFirebaseId: id, message: message, email: userState.email, messageOwner: user, channelName:channelName}
-          let updatedUserBookmarks = await Api.addUserBookMark(newPayload)
-          console.log(updatedUserBookmarks)
-        }
-      } catch (error) {
-        console.log(error)
+  const handleBookmarkClick = async (e) => {
+    const payload = { channelId: channelId, firebaseId: id, message: message };
+    try {
+      let req;
+      if (Private == true) {
+        req = await Api.bookMarkPrivateMessage(payload);
+      } else {
+        req = await Api.bookMarkMessage(payload);
       }
-  }
-
-  const handlePinClick = async (e)=>{
-    const payload = {channelId: channelId, messageFirebaseId: id, message: message, messageOwner: user}
-
-    try{
-      let req = await Api.pinMessage(payload);
-
-    }catch(err){
-      console.log(err)
+      if (userState.email) {
+        const newPayload = {
+          channelId: channelId,
+          messageFirebaseId: id,
+          message: message,
+          email: userState.email,
+          messageOwner: user,
+          channelName: channelName,
+        };
+        let updatedUserBookmarks = await Api.addUserBookMark(newPayload);
+        console.log(updatedUserBookmarks);
+      }
+    } catch (error) {
+      console.log(error);
     }
+  };
 
-  }
+  const handlePinClick = async (e) => {
+    const payload = {
+      channelId: channelId,
+      messageFirebaseId: id,
+      message: message,
+      messageOwner: user,
+    };
 
-
+    try {
+      if (Private == true) {
+        let req = await Api.pinPrivateMessage(payload);
+      } else {
+        let req = await Api.pinMessage(payload);
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
   return (
     <MessageContainer
@@ -60,10 +83,10 @@ function Message({ message, timestamp, user, userImage, id, channelId, channelNa
       <MessageRightContainer>
         {iconsShow && (
           <MessageIconsContainer>
-            <BookmarkBorderIcon onClick={(e)=>handleBookmarkClick(e)}/>
+            <BookmarkBorderIcon onClick={(e) => handleBookmarkClick(e)} />
             <FavoriteBorderIcon />
 
-            <LabelImportantIcon onClick={(e)=> handlePinClick(e)}/>
+            <LabelImportantIcon onClick={(e) => handlePinClick(e)} />
           </MessageIconsContainer>
         )}
       </MessageRightContainer>

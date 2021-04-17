@@ -8,7 +8,7 @@ import Api from '../../util/api.util'
 import { Redirect } from "react-router";
 import {useRoutes, useRedirect} from 'hookrouter';
 
-function SideBarOption({ Icon, title, addChannel, setAddChannelInputBool, addChannelInputBool, id, history }) {
+function SideBarOption({ Icon, title, addChannel, setAddChannelInputBool, addChannelInputBool, id, history, handleOpen }) {
   const dispatch = useDispatch();
 
   const handleAddChannel = async(name) => {
@@ -39,15 +39,16 @@ function SideBarOption({ Icon, title, addChannel, setAddChannelInputBool, addCha
   return (
     <SideBarOptionContainer
       onClick={addChannel ? handleAddChannel : handleSelectChannel}
+      onClick={handleOpen && handleOpen }
     >
       {!addChannelInputBool && (
         <>
-          {Icon && <Icon fontSize="small" style={{ padding: 10 }} />}
+          {Icon && <Icon fontSize="small" style={{ padding: 7 }} />}
           {Icon ? (
             <h3>{title}</h3>
           ) : (
             <SideBarOptionChannel>
-              <span>#</span> {title}
+              <span># <span>{title}</span></span> 
             </SideBarOptionChannel>
           )}
         </>
@@ -77,14 +78,28 @@ const SideBarOptionContainer = styled.div`
 
   > h3 {
     font-weight: 500;
+    text-decoration:'none';
+    color: 'black';
+    :hover{
+      text-decoration: none;
+    }
   }
 
   > h3 > span {
     padding: 15px;
+    color:'black';
+    
   }
 `;
 
 const SideBarOptionChannel = styled.h3`
   padding: 10px 0;
   font-weight:300;
+  >span{
+    color: black;
+  }
+  >span>span{
+    margin-left: 7px;
+    color: black;
+  }
 `;

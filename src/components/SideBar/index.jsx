@@ -8,19 +8,18 @@ import InboxIcon from "@material-ui/icons/Inbox";
 import DraftsIcon from "@material-ui/icons/Drafts";
 import BookmarkBorderIcon from "@material-ui/icons/BookmarkBorder";
 import PeopleAltIcon from "@material-ui/icons/PeopleAlt";
-import AppsIcon from "@material-ui/icons/Apps";
 import FileCopyIcon from "@material-ui/icons/FileCopy";
 import StarBorderIcon from "@material-ui/icons/StarBorder";
 import ExpandLessIcon from "@material-ui/icons/ExpandLess";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
+import LockIcon from '@material-ui/icons/Lock';
 import AddIcon from "@material-ui/icons/Add";
-import { useCollection } from "react-firebase-hooks/firestore";
 import { auth, db } from "../../firebase";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { Link } from "@material-ui/core";
 import AuthContext from "../../context/UserProvider/context";
 import Api from "../../util/api.util";
-import ArrowForwardIosIcon from "@material-ui/icons/ArrowForwardIos";
+import CreateChannelModal from "../CreateChannelModal";
 
 function SideBar(props) {
   const [addChannelInputBool, setAddChannelInputBool] = useState(false);
@@ -30,7 +29,21 @@ function SideBar(props) {
   const [username, setUsername] = useState(null);
   const [joinedChannels, setJoinedChannels] = useState([]);
   const [favoriteChannels, setFavoriteChannels] = useState([]);
+  const [privateChannels, setPrivateChannels] = useState([]);
   const [showChannels, setShowChannels] = useState(true);
+  const [searchValue, setSearchValue] = useState("");
+  const [open, setOpen] = useState(false);
+  const [showPrivateChannels, setShowPrivateChannels] = useState(true);
+
+  const handleChange = (e) => {
+    if (e.target) {
+      setSearchValue(e.target.value);
+    }
+  };
+
+  const handleOpen = () => {
+    setOpen(true);
+  };
 
   const getUserInfo = async () => {
     try {
@@ -49,14 +62,19 @@ function SideBar(props) {
       let req = await Api.getUserChannels(payload);
       setJoinedChannels(req.data.joinedChannels);
       setFavoriteChannels(req.data.favoriteChannels);
+      setPrivateChannels(req.data.privateChannels);
     } catch (error) {
       console.log(error);
     }
   };
 
-  const handleShowChannelsClick = () =>{
-    setShowChannels(!showChannels)
-  }
+  const handleShowChannelsClick = () => {
+    setShowChannels(!showChannels);
+  };
+
+  const handleShowPrivateChannelsClick = () => {
+    setShowPrivateChannels(!showPrivateChannels);
+  };
 
   useEffect(() => {
     !user && getUserInfo();
@@ -77,27 +95,27 @@ function SideBar(props) {
         <CreateIcon />
       </SideBarHeader>
 
-      <Link href="/">
+      <Link href="/" style={{textDecoration: 'none', color: 'black'}}>
         <SideBarOption Icon={InsertCommentIcon} title="Community Threads" />
       </Link>
       <SideBarOption Icon={InboxIcon} title="Inbox" />
       <SideBarOption Icon={DraftsIcon} title="Saved" />
-      <a href="/bookmarks">
+      <a href="/bookmarks" style={{textDecoration: 'none', color: 'black'}}>
         <SideBarOption Icon={BookmarkBorderIcon} title="My Bookmarks" />
       </a>
       <SideBarOption Icon={PeopleAltIcon} title="User groups & People" />
-      {/* <SideBarOption Icon={AppsIcon} title="Apps" /> */}
       <SideBarOption Icon={FileCopyIcon} title="Files" />
 
-      <hr/>
+      <hr />
 
-      <SideBarOption
-        Icon={AddIcon}
-        title="Create New Channel"
-        addChannel
-        addChannelInputBool={addChannelInputBool}
-        setAddChannelInputBool={setAddChannelInputBool}
-      />
+      <ModalContainer>
+        <SideBarOption
+          Icon={AddIcon}
+          title="Create New Channel"
+          handleOpen={handleOpen}
+        />
+        <CreateChannelModal open={open} setOpen={setOpen} />
+      </ModalContainer>
       <hr />
 
       <SideBarOption Icon={StarBorderIcon} title="Favorite Channels" />
@@ -115,20 +133,20 @@ function SideBar(props) {
           );
         })}
 
-
       {showChannels && (
-        <div onClick={()=>handleShowChannelsClick()}>
-        <SideBarOption Icon={ExpandLessIcon} title="Joined Channels" />
+        <div onClick={() => handleShowChannelsClick()}>
+          <SideBarOption Icon={ExpandLessIcon} title="Joined Channels" />
         </div>
       )}
 
       {!showChannels && (
-        <div onClick={()=>handleShowChannelsClick()}>
-        <SideBarOption Icon={ExpandMoreIcon} title="Joined Channels" />
+        <div onClick={() => handleShowChannelsClick()}>
+          <SideBarOption Icon={ExpandMoreIcon} title="Joined Channels" />
         </div>
       )}
 
-      {(joinedChannels.length > 0 && showChannels) &&
+      {joinedChannels.length > 0 &&
+        showChannels &&
         joinedChannels.map((channel) => {
           return (
             <Link href={`/channel/${channel.firebaseId}`}>
@@ -141,7 +159,32 @@ function SideBar(props) {
           );
         })}
 
-      
+      {showPrivateChannels==true && (
+        <div onClick={()=>handleShowPrivateChannelsClick()}>
+          <SideBarOption Icon={ExpandLessIcon} title="Private Channels" />
+        </div>
+      )}
+
+      {showPrivateChannels==false && (
+        <div onClick={()=>handleShowPrivateChannelsClick()}>
+          <SideBarOption Icon={ExpandMoreIcon} title="Private Channels" />
+        </div>
+      )}
+
+      {privateChannels.length > 0 &&
+        showPrivateChannels==true &&
+        privateChannels.map((channel) => {
+          return (
+            <Link href={`/channel/private/${channel.firebaseId}`}>
+              <SideBarOption
+                Icon={LockIcon}
+                key={channel.firebaseId}
+                id={channel.firebaseId}
+                title={channel.name}
+              />
+            </Link>
+          );
+        })}
     </SideBarContainer>
   );
 }
@@ -160,6 +203,21 @@ const SideBarContainer = styled.div`
     margin-top: 10px;
     margin-bottom: 10px;
     border: 1px solid #aaeced;
+  }
+`;
+
+const ModalContainer = styled.div`
+  > div {
+    display: flex;
+    align-items: center;
+    > h6 {
+      margin-right: 5px;
+      color: white;
+    }
+
+    > .MuiSvgIcon-root {
+      color: black;
+    }
   }
 `;
 

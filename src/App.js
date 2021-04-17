@@ -6,7 +6,6 @@ import styled from "styled-components";
 import SideBar from "./components/SideBar";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "./firebase";
-import HomeScreen from "./components/HomeScreen";
 import Login from "./components/Login";
 import Spinner from "react-spinkit";
 import BookMarkedList from "./components/BookMarkedList";
@@ -16,6 +15,7 @@ import UserInfoContext from "./context/UserInfoProvider/context";
 import Api from "./util/api.util";
 import Channel from "./components/Channel";
 import Threads from "./components/Threads";
+import PrivateChannel from "./components/PrivateChannel";
 
 function App() {
   const [user, loading] = useAuthState(auth);
@@ -59,6 +59,7 @@ function App() {
                     <Route exact path="/" component={Threads}/>
                     <Route exact path="/bookmarks" component={BookMarkedList}/>
                     <Route path="/channel/:channelId" exact component={Channel}/>
+                    <Route path='/channel/private/:channelId' component={PrivateChannel}/>
                   </Switch>
                 </AppBody>
               </>

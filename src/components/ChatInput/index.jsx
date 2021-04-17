@@ -6,7 +6,7 @@ import firebase from 'firebase';
 import { useAuthState } from 'react-firebase-hooks/auth';
 
 
-function ChatInput({channelName, channelId, chatBottomRef}) {
+function ChatInput({channelName, channelId, chatBottomRef, Private}) {
     const [message, setMessage] = useState("");
     const [user] = useAuthState(auth)
 
@@ -18,12 +18,21 @@ function ChatInput({channelName, channelId, chatBottomRef}) {
 
         if (message.length>3){
             try{
-            let msg = await db.collection('rooms').doc(channelId).collection('messages').add({
-                message: message,
-                timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-                user: user?.displayName,
-                userImage: user?.photoURL
-            });
+            if (Private==true){
+                let msg = await db.collection('privaterooms').doc(channelId).collection('messages').add({
+                    message: message,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                    user: user?.displayName,
+                    userImage: user?.photoURL
+                });
+            }else{
+                let msg = await db.collection('rooms').doc(channelId).collection('messages').add({
+                    message: message,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                    user: user?.displayName,
+                    userImage: user?.photoURL
+                });
+            }
             
 
             }catch(err){
