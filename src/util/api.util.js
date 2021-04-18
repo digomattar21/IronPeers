@@ -3,8 +3,8 @@ import axios from "axios";
 class Api {
   constructor() {
     this.api = axios.create({
-      // baseURL: 'https://betmaker-api.herokuapp.com',
-      baseURL: "http://localhost:3080",
+       baseURL: 'https://ironpeersapi.herokuapp.com',
+      // baseURL: "http://localhost:3080",
     });
 
     this.api.interceptors.request.use((config) => {
