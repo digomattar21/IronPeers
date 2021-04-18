@@ -1,12 +1,23 @@
 import React from "react";
 import styled from "styled-components";
+import LockIcon from '@material-ui/icons/Lock';
 
 function BookmarkedCard({ bookmark }) {
   return (
     <BookMarkedCardContainer>
       <BookmarkContainer>
         <BookmarkInfo>
-          <h4>
+          <div className="channelContainer">
+            {bookmark.isPrivate ? (
+              <>
+              <LockIcon />
+              <h5>{bookmark.channelName}</h5>
+              </>
+            ):(
+              <h5>#{bookmark.channelName}</h5>
+            )}
+          </div>
+            <h4>
             {bookmark.messageOwner} <span>{(bookmark.createdAt.split('T')[0])} {bookmark.createdAt.split('T')[1].slice(0,-2)}</span>
           </h4>
           <p>{bookmark.message}</p>
@@ -41,6 +52,9 @@ const BookmarkContainer = styled.div`
 
 const BookmarkInfo = styled.div`
   padding-left: 10px;
+  >p{
+    margin-top: 10px;
+  }
 
   > h4 {
     display: flex;
@@ -52,6 +66,16 @@ const BookmarkInfo = styled.div`
     font-weight: 200px;
     margin-left: 8px;
     font-size: 10px;
+  }
+  >.channelContainer{
+    display: flex;
+    align-items: center;
+    justify-content:center;
+    >.MuiSvgIcon-root {
+      color: green;
+      font-size: 15px;
+    }
+    margin-bottom: 15px;
   }
 `;
 

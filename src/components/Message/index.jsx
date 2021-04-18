@@ -39,8 +39,12 @@ function Message({
           messageOwner: user,
           channelName: channelName,
         };
-        let updatedUserBookmarks = await Api.addUserBookMark(newPayload);
-        console.log(updatedUserBookmarks);
+        if (Private==true){
+          let updatedPrivateUserBookmarks = await Api.addPrivateUserBookMark(newPayload);
+          console.log('entrou')
+        }else{
+          let updatedUserBookmarks = await Api.addUserBookMark(newPayload);
+        }
       }
     } catch (error) {
       console.log(error);

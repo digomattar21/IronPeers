@@ -12,7 +12,7 @@ import styled from "styled-components";
 import { auth, db } from "../../firebase";
 import Api from "../../util/api.util";
 
-function CreateChannelModal({ open, setOpen }) {
+function CreateChannelModal({ open, setOpen, setUpdatedSideBar, updatedSideBar }) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [privateChecked, setPrivateChecked] = useState(false);
@@ -58,7 +58,8 @@ function CreateChannelModal({ open, setOpen }) {
           };
           let req3 = await Api.addPrivateChannel(payload);
         }
-        setOpen(false)
+        setOpen(false);
+        setUpdatedSideBar(!updatedSideBar);
       } else {
         setMessage("Invalid title, please use only letters, no spaces");
       }

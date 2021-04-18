@@ -126,7 +126,7 @@ class Api {
     }
   }
 
-  async bookMarkMessage(payload) {
+  async bookMarkPrivateMessage(payload) {
     try {
       let req = await this.api.post("/channels/private/bookmarkmessage", payload);
       return req;
@@ -150,6 +150,16 @@ class Api {
   async addUserBookMark(payload) {
     try {
       let req = await this.api.post("/user/adduserbookmark", payload);
+      console.log(req);
+      return req;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async addPrivateUserBookMark(payload){
+    try {
+      let req = await this.api.post("/user/adduserprivatebookmark", payload);
       console.log(req);
       return req;
     } catch (error) {
@@ -211,6 +221,15 @@ class Api {
     }
   };
 
+  async getPrivateChannelMembersLength(channelId){
+    try {
+      let req = await this.api.get(`/channels/private/getchannelmemberslength/${channelId}`);
+      return req;
+    } catch (error) {
+      throw error;
+    }
+  };
+
   async userJoinChannel(payload){
     try {
         let req = await this.api.post('/user/joinchannel', payload);
@@ -234,6 +253,36 @@ class Api {
   async setFavoriteChannel(payload){
     try {
       let req = await this.api.post('/user/setfavoritechannel', payload);
+      return req
+    } catch (error) {
+      throw error
+    }
+  }
+
+  async sendPrivateChannelInvite(payload) {
+
+    try {
+      let req = await this.api.post('/user/sendprivatechannelinvite', payload);
+      return req
+
+    } catch (error) {
+      throw error;
+    }
+
+  }
+
+  async getUserInboxInfo(payload){
+    try {
+        let req = await this.api.post('/user/inbox/getinfo', payload)
+        return req
+    } catch (error) {
+      throw error
+    }
+  }
+
+  async getInviteInfo(payload){
+    try {
+      let req = await this.api.post('/user/invites/getinfo', payload);
       return req
     } catch (error) {
       throw error
