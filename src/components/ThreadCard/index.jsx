@@ -8,6 +8,7 @@ import { Redirect } from "react-router";
 import { Link } from "@material-ui/core";
 import StarOutlineIcon from '@material-ui/icons/StarOutline';
 import StarIcon from '@material-ui/icons/Star';
+import GroupIcon from '@material-ui/icons/Group';
 
 function ThreadCard({ id, title }) {
   const [length, setLength] = useState(0);
@@ -64,7 +65,10 @@ function ThreadCard({ id, title }) {
             {!fullStar && (<StarOutlineIcon onClick={()=>handleFavoriteChannelClick()}/>)}
             {fullStar && (<StarIcon />)}
           </div>
-          <h6> members : {length}</h6>
+          <div>
+            <GroupIcon/>
+            <h6> members : {length}</h6>
+          </div>
         </div>
         {iconsShow && (
           <div
@@ -93,6 +97,7 @@ const ThreadCardContainer = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding-bottom: 15px;
   > div > div > h4 {
     color: black;
     font-weight: 500;
@@ -102,14 +107,23 @@ const ThreadCardContainer = styled.div`
   > div >div> h4:hover {
     outline: none;
   }
-  > div > h6 {
+  > div > div> h6 {
     color: darkgray;
-    margin-bottom: 15px;
+  }
+  >div>div{
+    display: flex;
+    align-items: center;
+    
+    >.MuiSvgIcon-root{
+      font-size: 10px;
+      color: darkgray;
+      margin-right: 4px;
+    }
   }
   .titleIconContainer{
     display: flex;
     flex-direction: row;
-    justify-content:flex-start;
+    justify-content:center;
     .MuiSvgIcon-root {
       margin-left: 5px;
       font-size: 17px;

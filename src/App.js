@@ -16,6 +16,7 @@ import Api from "./util/api.util";
 import Channel from "./components/Channel";
 import Threads from "./components/Threads";
 import PrivateChannel from "./components/PrivateChannel";
+import Inbox from "./components/Inbox";
 
 function App() {
   const [user, loading] = useAuthState(auth);
@@ -60,6 +61,7 @@ function App() {
                     <Route exact path="/bookmarks" component={BookMarkedList}/>
                     <Route path="/channel/:channelId" exact component={Channel}/>
                     <Route path='/channel/private/:channelId' component={PrivateChannel}/>
+                    <Route path='/inbox' component={Inbox}/>
                   </Switch>
                 </AppBody>
               </>

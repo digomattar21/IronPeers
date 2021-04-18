@@ -8,13 +8,13 @@ import CloseIcon from "@material-ui/icons/Close";
 import LockIcon from "@material-ui/icons/Lock";
 import { useSelector } from "react-redux";
 import ChatInput from "../ChatInput";
-import { selectRoomId } from "../../features/appSlice";
 import { auth, db } from "../../firebase";
 import Message from "../Message";
 import Api from "../../util/api.util";
 import RoomDetails from "../RoomDetails";
-import StarIcon from '@material-ui/icons/Star';
-
+import GroupIcon from "@material-ui/icons/Group";
+import GroupAddIcon from "@material-ui/icons/GroupAdd";
+import AddUsersModal from "../AddUsersModal";
 
 function PrivateChannel() {
   const chatBottomRef = useRef(null);
@@ -23,11 +23,14 @@ function PrivateChannel() {
   const [displayDetails, setDisplayDetails] = useState(false);
   const [pinnedMessages, setPinnedMessages] = useState([]);
   const [buttonForExit, setButtonForExit] = useState(false);
+  const [membersLength, setMembersLength] = useState(0);
+  const [open, setOpen] = useState(false);
+  const [showPrivateChannels, setShowPrivateChannels] = useState(true);
+  const [updatedSideBar, setUpdatedSideBar] = useState(false);
 
   const [roomDetails] = useDocument(
     channelId && db.collection("privaterooms").doc(channelId)
   );
-
 
   const [roomMessages, loading] = useCollection(
     channelId &&
@@ -52,6 +55,23 @@ function PrivateChannel() {
     }
   };
 
+  const getPrivateChannelInfo = async () => {
+    let payload = { channelId: channelId };
+    try {
+      if (channelId) {
+        let req = await Api.getPrivateChannelMembersLength(channelId);
+        console.log(req);
+        setMembersLength(req.data.membersLength);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleOpen = () => {
+    setOpen(true);
+  };
+
   const handleExitDetailsClick = (e) => {
     setButtonForExit(false);
     setDisplayDetails(false);
@@ -61,6 +81,7 @@ function PrivateChannel() {
     chatBottomRef?.current?.scrollIntoView({
       behavior: "smooth",
     });
+    getPrivateChannelInfo();
   }, [channelId, loading]);
 
   return (
@@ -69,23 +90,41 @@ function PrivateChannel() {
         <>
           <Header>
             <HeaderLeft>
-                <LockIcon/>
-                <h4 style={{marginLeft:'10px'}}>{roomDetails?.data().name}</h4>
+              <div className="first-container">
+                <LockIcon />
+                <h4 style={{ marginLeft: "10px" }}>
+                  {roomDetails?.data().name}
+                </h4>
+              </div>
+              <div className="second-container">
+                <GroupIcon />
+                <h6> members : {membersLength}</h6>
+              </div>
             </HeaderLeft>
 
             <HeaderRight>
-              {buttonForExit == false && (
-                <div onClick={handleDetailsClick}>
-                  <InfoOutlinedIcon /> Details
-                </div>
-              )}
-              {buttonForExit ==true && (
-                <CloseIcon onClick={handleExitDetailsClick}/>
-              )}
+              <div>
+                <GroupAddIcon onClick={()=>handleOpen()} />
+                <AddUsersModal
+                  updatedSideBar={updatedSideBar}
+                  setUpdatedSideBar={setUpdatedSideBar}
+                  open={open}
+                  setOpen={setOpen}
+                  channelId={channelId}
+                />
+              </div>
+              <div>
+                {buttonForExit == false && (
+                  <InfoOutlinedIcon onClick={handleDetailsClick} />
+                )}
+                {buttonForExit == true && (
+                  <CloseIcon onClick={handleExitDetailsClick} />
+                )}
+              </div>
             </HeaderRight>
           </Header>
 
-          {displayDetails==false && (
+          {displayDetails == false && (
             <>
               <ChatMessages>
                 {roomMessages?.docs.map((doc) => {
@@ -139,22 +178,42 @@ const Header = styled.div`
 
 const HeaderLeft = styled.div`
   display: flex;
+  flex-direction: column;
   align-items: center;
-  > h4 {
-    font-weight: bold;
+  > .second-container {
     display: flex;
-    text-transform: lowercase;
-    margin-right: 5px;
+    align-items: center;
+    margin-top: 5px;
+
+    > h6 {
+      color: darkgray;
+    }
+
+    > .MuiSvgIcon-root {
+      font-size: 10px;
+      color: darkgray;
+      margin-right: 4px;
+    }
   }
 
-  > .MuiSvgIcon-root {
-    margin-left: 1px;
-    font-size: 20px;
-    color: green;
-    :hover{
-      cursor: pointer;
-      transform: scale(1.05);
-      opacity: 0.8;
+  > .first-container {
+    display: flex;
+    align-items: center;
+    > .MuiSvgIcon-root {
+      margin-left: 1px;
+      font-size: 20px;
+      color: green;
+      :hover {
+        cursor: pointer;
+        transform: scale(1.05);
+        opacity: 0.8;
+      }
+    }
+    > h4 {
+      font-weight: bold;
+      display: flex;
+      text-transform: lowercase;
+      margin-right: 5px;
     }
   }
 `;
@@ -162,9 +221,6 @@ const HeaderLeft = styled.div`
 const HeaderRight = styled.div`
   display: flex;
   align-items: center;
-  padding: 8px 12px;
-  border-radius: 6px;
-  border: 2px solid darkgray;
   :hover {
     opacity: 0.8;
     cursor: pointer;
@@ -174,6 +230,9 @@ const HeaderRight = styled.div`
     align-items: center;
     font-size: 14px;
     color: black;
+    border: 2px solid darkgray;
+    padding: 8px 12px;
+    border-radius: 6px;
   }
 
   > p > .MuiSvgIcon-root {

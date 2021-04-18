@@ -12,7 +12,7 @@ import FileCopyIcon from "@material-ui/icons/FileCopy";
 import StarBorderIcon from "@material-ui/icons/StarBorder";
 import ExpandLessIcon from "@material-ui/icons/ExpandLess";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
-import LockIcon from '@material-ui/icons/Lock';
+import LockIcon from "@material-ui/icons/Lock";
 import AddIcon from "@material-ui/icons/Add";
 import { auth, db } from "../../firebase";
 import { useAuthState } from "react-firebase-hooks/auth";
@@ -34,6 +34,7 @@ function SideBar(props) {
   const [searchValue, setSearchValue] = useState("");
   const [open, setOpen] = useState(false);
   const [showPrivateChannels, setShowPrivateChannels] = useState(true);
+  const [updatedSideBar, setUpdatedSideBar] = useState(false);
 
   const handleChange = (e) => {
     if (e.target) {
@@ -79,7 +80,7 @@ function SideBar(props) {
   useEffect(() => {
     !user && getUserInfo();
     getUserChannels();
-  }, []);
+  },[updatedSideBar]);
 
   return (
     <SideBarContainer>
@@ -95,12 +96,14 @@ function SideBar(props) {
         <CreateIcon />
       </SideBarHeader>
 
-      <Link href="/" style={{textDecoration: 'none', color: 'black'}}>
+      <Link href="/" style={{ textDecoration: "none", color: "black" }}>
         <SideBarOption Icon={InsertCommentIcon} title="Community Threads" />
       </Link>
-      <SideBarOption Icon={InboxIcon} title="Inbox" />
+      <Link href="/inbox" style={{ textDecoration: "none", color: "black" }}>
+        <SideBarOption Icon={InboxIcon} title="Inbox" />
+      </Link>
       <SideBarOption Icon={DraftsIcon} title="Saved" />
-      <a href="/bookmarks" style={{textDecoration: 'none', color: 'black'}}>
+      <a href="/bookmarks" style={{ textDecoration: "none", color: "black" }}>
         <SideBarOption Icon={BookmarkBorderIcon} title="My Bookmarks" />
       </a>
       <SideBarOption Icon={PeopleAltIcon} title="User groups & People" />
@@ -114,7 +117,8 @@ function SideBar(props) {
           title="Create New Channel"
           handleOpen={handleOpen}
         />
-        <CreateChannelModal open={open} setOpen={setOpen} />
+        <CreateChannelModal updatedSideBar={updatedSideBar} setUpdatedSideBar={setUpdatedSideBar} open={open} setOpen={setOpen} />
+
       </ModalContainer>
       <hr />
 
@@ -159,20 +163,20 @@ function SideBar(props) {
           );
         })}
 
-      {showPrivateChannels==true && (
-        <div onClick={()=>handleShowPrivateChannelsClick()}>
+      {showPrivateChannels == true && (
+        <div onClick={() => handleShowPrivateChannelsClick()}>
           <SideBarOption Icon={ExpandLessIcon} title="Private Channels" />
         </div>
       )}
 
-      {showPrivateChannels==false && (
-        <div onClick={()=>handleShowPrivateChannelsClick()}>
+      {showPrivateChannels == false && (
+        <div onClick={() => handleShowPrivateChannelsClick()}>
           <SideBarOption Icon={ExpandMoreIcon} title="Private Channels" />
         </div>
       )}
 
       {privateChannels.length > 0 &&
-        showPrivateChannels==true &&
+        showPrivateChannels == true &&
         privateChannels.map((channel) => {
           return (
             <Link href={`/channel/private/${channel.firebaseId}`}>

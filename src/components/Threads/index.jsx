@@ -22,12 +22,9 @@ function Threads() {
     }
   }
 
-
   const handleOpen = () => {
     setOpen(true);
   };
-
-
   return (
     <ThreadsContainer>
       <TitleContainer>
