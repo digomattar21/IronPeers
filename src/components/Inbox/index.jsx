@@ -9,6 +9,7 @@ function Inbox() {
   const [user] = useAuthState(auth);
   const [allInvites, setAllInvites] = useState(null);
   const [hasUnread, setHasUnread] = useState(false);
+  const [reRender, setReRender] = useState(false);
 
   const getInboxInfo = async () => {
     let payload = { userEmail: user.email };
@@ -16,6 +17,18 @@ function Inbox() {
       let req = await Api.getUserInboxInfo(payload);
       setHasUnread(req.data.hasUnread);
       setAllInvites(req.data.invites.reverse());
+      if (req.data.invites.length<=0){
+        handleHasUnread()
+    }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleHasUnread = async () => {
+    let payload = { userEmail: user.email };
+    try {
+      await Api.setUnreadFalse(payload);
     } catch (error) {
       console.log(error);
     }
@@ -23,7 +36,7 @@ function Inbox() {
 
   useEffect(() => {
     getInboxInfo();
-  }, []);
+  }, [reRender]);
 
   return (
     <InboxContainer>
@@ -33,22 +46,33 @@ function Inbox() {
 
       <InboxLowerContainer>
         <InboxLowerContainerMiddle>
-          <div>
-            <h4>Channel Invites</h4>
-          </div>
-
           {allInvites &&
             allInvites.length > 0 &&
             allInvites.map((invite) => {
+              console.log(invite._id);
               return (
-                <InviteCard
-                  userWhoInvited={invite.userWhoInvited}
-                  read={invite.read}
-                  channelFirebaseId={invite.channelFirebaseId}
-                  timestamp={invite.createdAt}
-                />
+                <>
+                  <div>
+                    <h4>Channel Invites</h4>
+                  </div>
+                  <InviteCard
+                    key={invite._id}
+                    id={invite._id}
+                    userWhoInvited={invite.userWhoInvited}
+                    read={invite.read}
+                    channelFirebaseId={invite.channelFirebaseId}
+                    timestamp={invite.createdAt}
+                    reRender={reRender}
+                    setReRender={setReRender}
+                  />
+                </>
               );
             })}
+          {allInvites && allInvites.length <= 0 && (
+            <h5 style={{ color: "darkgray" }}>
+              You dont have any inboxes, try checking it out later
+            </h5>
+          )}
         </InboxLowerContainerMiddle>
 
         <InboxLowerContainerTemp></InboxLowerContainerTemp>

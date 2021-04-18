@@ -289,6 +289,32 @@ class Api {
     }
   }
 
+  async userJoinPrivateChannel(payload){
+    try {
+      let req = await this.api.post('/user/channel/private/joinprivatechannel', payload);
+      return req
+    } catch (error) {
+      throw error
+    }
+  }
+
+  async deleteInvite(payload){
+    try {
+      return await this.api.post('/user/invite/deleteone', payload);
+    } catch (error) {
+      throw error
+    }
+  }
+
+  async setUnreadFalse(payload){
+    try {
+      let req = await this.api.post('/user/inbox/sethasunreadfalse', payload);
+      return req
+    } catch (error) {
+      throw error
+    }
+  }
+
 
 }
 
