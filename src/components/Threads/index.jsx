@@ -14,6 +14,7 @@ import CreateChannelModal from "../CreateChannelModal";
 function Threads() {
   const [channels, loading, error] = useCollection(db.collection("rooms"));
   const [searchValue, setSearchValue] = useState("");
+  const [updatedSideBar, setUpdatedSideBar] = useState(false);
   const [open, setOpen] = useState(false);
 
   const handleChange = (e) => {
@@ -50,7 +51,7 @@ function Threads() {
               <AddToPhotosIcon />
             </div>
 
-            <CreateChannelModal open={open} setOpen={setOpen}/>
+            <CreateChannelModal updatedSideBar={updatedSideBar} setUpdatedSideBar={setUpdatedSideBar} open={open} setOpen={setOpen} />
           </ModalContainer>
         </MidRightContainer>
       </MidContainer>

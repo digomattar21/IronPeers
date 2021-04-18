@@ -35,6 +35,7 @@ function SideBar(props) {
   const [open, setOpen] = useState(false);
   const [showPrivateChannels, setShowPrivateChannels] = useState(true);
   const [updatedSideBar, setUpdatedSideBar] = useState(false);
+  const [hasUnread, setHasUnread] = useState(null)
 
   const handleChange = (e) => {
     if (e.target) {
@@ -46,24 +47,16 @@ function SideBar(props) {
     setOpen(true);
   };
 
-  const getUserInfo = async () => {
-    try {
-      let req = await Api.getUserInfo();
-      console.log(req);
-      setUsername(req.data.userAuth.username);
-    } catch (error) {
-      setMessage(error);
-      changeUserAuth(false);
-    }
-  };
 
   const getUserChannels = async () => {
     let payload = { userEmail: user.email };
     try {
       let req = await Api.getUserChannels(payload);
+      console.log(req)
       setJoinedChannels(req.data.joinedChannels);
       setFavoriteChannels(req.data.favoriteChannels);
       setPrivateChannels(req.data.privateChannels);
+      setHasUnread(req.data.hasUnread)
     } catch (error) {
       console.log(error);
     }
@@ -78,9 +71,8 @@ function SideBar(props) {
   };
 
   useEffect(() => {
-    !user && getUserInfo();
     getUserChannels();
-  },[updatedSideBar]);
+  }, [updatedSideBar]);
 
   return (
     <SideBarContainer>
@@ -100,7 +92,10 @@ function SideBar(props) {
         <SideBarOption Icon={InsertCommentIcon} title="Community Threads" />
       </Link>
       <Link href="/inbox" style={{ textDecoration: "none", color: "black" }}>
-        <SideBarOption Icon={InboxIcon} title="Inbox" />
+        <InboxContainer>
+          <SideBarOption Icon={InboxIcon} title="Inbox" />
+          {hasUnread==true && <FiberManualRecordIcon className="record-icon"/>}
+        </InboxContainer>
       </Link>
       <SideBarOption Icon={DraftsIcon} title="Saved" />
       <a href="/bookmarks" style={{ textDecoration: "none", color: "black" }}>
@@ -117,8 +112,12 @@ function SideBar(props) {
           title="Create New Channel"
           handleOpen={handleOpen}
         />
-        <CreateChannelModal updatedSideBar={updatedSideBar} setUpdatedSideBar={setUpdatedSideBar} open={open} setOpen={setOpen} />
-
+        <CreateChannelModal
+          updatedSideBar={updatedSideBar}
+          setUpdatedSideBar={setUpdatedSideBar}
+          open={open}
+          setOpen={setOpen}
+        />
       </ModalContainer>
       <hr />
 
@@ -194,6 +193,21 @@ function SideBar(props) {
 }
 
 export default SideBar;
+
+const InboxContainer = styled.div`
+  display: flex;
+  align-items: center;
+  >.MuiSvgIcon-root {
+    color: red;
+    font-size: 8px;
+    margin-left: 2px;
+    padding-bottom:4px;
+  }
+  :hover{
+    background-color: white;
+  }
+
+`;
 
 const SideBarContainer = styled.div`
   color: black;
