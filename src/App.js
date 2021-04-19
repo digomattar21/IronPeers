@@ -1,5 +1,5 @@
 import React, { useContext, useState } from "react";
-import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
+import { BrowserRouter as Router, Switch, Route, useHistory } from "react-router-dom";
 import "./App.css";
 import Header from "./components/Header";
 import styled from "styled-components";
@@ -18,7 +18,7 @@ import Inbox from "./components/Inbox";
 
 function App() {
   const [user, loading] = useAuthState(auth);
-
+  const history = useHistory()
 
   if (loading) {
     return <Loading />;

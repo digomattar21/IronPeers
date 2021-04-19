@@ -5,7 +5,6 @@ import { auth, db } from "../../firebase";
 import BookmarkBorderIcon from "@material-ui/icons/BookmarkBorder";
 import LabelImportantIcon from "@material-ui/icons/LabelImportant";
 import FavoriteBorderIcon from "@material-ui/icons/FavoriteBorder";
-import { useCollection } from "react-firebase-hooks/firestore";
 import Api from "../../util/api.util";
 
 function Message({
@@ -112,15 +111,18 @@ const MessageIconsContainer = styled.div`
   justify-content: flex-start;
   align-items: center;
   margin-bottom: 10px;
-  padding: 6px 5px;
+  padding: 8px 6px;
   border: 1px solid var(--ironblue-color);
   border-radius: 9px;
   > .MuiSvgIcon-root {
-    font-size: 18px;
+    font-size: 20px;
     color: var(--ironblue-color);
+    margin-left: 5px;
     :hover {
       cursor: pointer;
+      transform: scale(1.2)
     }
+    
   }
 `;
 
