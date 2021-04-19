@@ -1,10 +1,8 @@
 import { Button, TextField } from "@material-ui/core";
 import React, { useContext, useState } from "react";
 import styled from "styled-components";
-import AuthContext from '../../context/UserProvider/context';
 import { auth, provider } from "../../firebase";
 import Api from "../../util/api.util";
-import ConfirmCode from '../ConfirmCode';
 import Login from "../Login";
 
 function SignUp() {
@@ -13,9 +11,7 @@ function SignUp() {
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState(null);
 
-  const {userAuth,changeUserAuth} = useContext(AuthContext);
   const [signUpState, setSignUpState] = useState(true);
-  const [confirmState, setConfirmState] = useState(false)
 
   const handleGoogleSignInClick = async (e) => {
     e.preventDefault();
@@ -27,9 +23,9 @@ function SignUp() {
         email: signin.user.email,
         profilePic: signin.user.photoURL,
       };
-      console.log(payload);
+     
       let apiReq = await Api.signUpWithGoogle(payload);
-      console.log(apiReq);
+      
     } catch (errr) {
       console.log(errr);
     }
@@ -38,22 +34,43 @@ function SignUp() {
   const handleSignUpSubmit = async (e) => {
     e.preventDefault();
     let passRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9])(?!.*\s).{8,20}$/;
-    let payload = { username: username, email: email, password: password };
-      try{
-        let req = await Api.signup(payload);
-        console.log(req)
-        setSignUpState(false)
-        setConfirmState(true)
+    let emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/
+    let usernameRegex = /^[a-z0-9_-]{3,15}$/
+    try {
+      if (passRegex.test(password)) {
+        if (emailRegex.test(email)){
+          if (usernameRegex.test(username)){
+            let payload = {
+              username: username,
+              email: email,
+              profilePic: 'https://picsum.photos/100',
+            };
+            await Api.signUpWithEmail(payload);
 
-      }catch(err){
-        console.log(err)
-        setMessage(err)
-      }
-        
-        
-
-      console.log('entrouu')
+            await auth.createUserWithEmailAndPassword(
+              email,
+              password
+            );
+            var user = auth.currentUser;
+            await user.updateProfile({
+              displayName: username,
+              photoURL: "https://picsum.photos/100",
+            });
     
+            
+            
+          }else{
+            throw new Error('Invalid username, please use only letters and numbers, no spaces')
+          }
+        }else{
+          throw new Error("Invalid Email")
+        }
+      }else{
+        throw new Error('Your password must contain at least 8 characters, lowercase and uppercase letters, numbers and a special digit')
+      }
+    } catch (error) {
+      console.log(error.message);
+    }
   };
 
   const handleChange = (e) => {
@@ -153,15 +170,10 @@ function SignUp() {
             <SignUpTextContainer onClick={() => setSignUpState(false)}>
               Already have an acccount? Sign In
             </SignUpTextContainer>
-
-            
           </SignUpInsideContainer>
         </SignUpContainer>
       )}
-      {(signUpState == false && confirmState == false) && <Login />}
-      {confirmState==true &&(
-        <ConfirmCode />
-      )}
+      {signUpState == false && <Login />}
     </>
   );
 }
@@ -181,19 +193,19 @@ const SignUpFormContainer = styled.div`
     flex-direction: column;
     margin-top: 10px;
     > Button {
-    color: white;
-    font-size: 15px;
-    font-weight: 300;
-    text-transform: inherit !important;
-    background-color: var(--ironblue-color) !important;
-    padding: 5px 10px;
+      color: white;
+      font-size: 15px;
+      font-weight: 300;
+      text-transform: inherit !important;
+      background-color: var(--ironblue-color) !important;
+      padding: 5px 10px;
+    }
   }
-  }
-  >h6{
+  > h6 {
     margin-top: 5px;
     color: red;
     max-width: 50%;
-    text-align:center;
+    text-align: center;
     margin-left: 24%;
   }
   #input {
@@ -202,7 +214,6 @@ const SignUpFormContainer = styled.div`
     margin-top: 15px;
     margin-bottom: 15px;
   }
-  
 `;
 
 const SignUpTextContainer = styled.h4`

@@ -1,8 +1,6 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import styled from "styled-components";
-import UserInfoContext from "../../context/UserInfoProvider/context";
-import AuthContext from "../../context/UserProvider/context";
 import { auth } from "../../firebase";
 import Api from "../../util/api.util";
 import BookmarkedCard from "../BookmarkedCard";
@@ -11,26 +9,12 @@ import Loading from "../Loading";
 function BookMarkedList() {
   const [user] = useAuthState(auth);
   const [bookmarks, setBookmarks] = useState(null);
-  const { userAuth, changeUserAuth } = useContext(AuthContext);
   const [message, setMessage] = useState(null);
-  const { userInfo, getUserInfo } = useContext(UserInfoContext);
 
   useEffect(() => {
     user && getBookMarks();
-    !user && getUser();
   }, []);
 
-  const getUser = async () => {
-    try {
-      let user = await getUserInfo();
-      console.log(user);
-      //   setUsername(req.data.userAuth.username)
-      //   setBookmarksv2(req.data.userAuth.myBookmarks)
-    } catch (error) {
-      setMessage(error);
-      changeUserAuth(false);
-    }
-  };
 
   const getBookMarks = async () => {
     try {

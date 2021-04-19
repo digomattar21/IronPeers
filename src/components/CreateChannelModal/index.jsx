@@ -17,7 +17,8 @@ function CreateChannelModal({ open, setOpen, setUpdatedSideBar, updatedSideBar }
   const [description, setDescription] = useState("");
   const [privateChecked, setPrivateChecked] = useState(false);
   const [message, setMessage] = useState(null);
-  const [user] = useAuthState(auth);
+  const [user] = useAuthState(auth) || auth.currentUser;
+  
 
   const handleChange = (e) => {
     const { name, value } = e.target;

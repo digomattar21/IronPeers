@@ -22,7 +22,7 @@ function Threads() {
       setSearchValue(e.target.value)
     }
   }
-
+  // auth.signOut()
   const handleOpen = () => {
     setOpen(true);
   };
