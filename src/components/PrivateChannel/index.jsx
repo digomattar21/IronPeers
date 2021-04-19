@@ -128,7 +128,7 @@ function PrivateChannel() {
             <>
               <ChatMessages>
                 {roomMessages?.docs.map((doc) => {
-                  const { message, timestamp, user, userImage } = doc.data();
+                  const { message, timestamp, user, userImage, fileDownloadUrl } = doc.data();
                   return (
                     <Message
                       Private={true}
@@ -140,6 +140,7 @@ function PrivateChannel() {
                       userImage={userImage}
                       channelId={channelId}
                       channelName={roomDetails?.data().name}
+                      fileDownloadUrl={fileDownloadUrl}
                     />
                   );
                 })}
