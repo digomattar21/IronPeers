@@ -27,7 +27,7 @@ class Api {
       (error) => {
         if (typeof window !== "undefined") {
           localStorage.removeItem("token");
-          auth.signOut()
+          // auth.signOut()
           throw JSON.stringify(error.response.data.message);
         }
       }
