@@ -1,7 +1,6 @@
 import { Button, TextField } from "@material-ui/core";
 import React, { useContext, useState } from "react";
 import styled from "styled-components";
-import AuthContext from '../../context/UserProvider/context';
 import { auth, provider } from "../../firebase";
 import Api from "../../util/api.util";
 import SignUp from '../SignUp';
@@ -10,13 +9,11 @@ function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loginState, setLoginState] = useState(true);
-  const {userAuth, changeUserAuth} = useContext(AuthContext);
 
   const handleGoogleSignInClick = async (e) => {
     e.preventDefault();
     try {
       let signin = await auth.signInWithPopup(provider);
-      console.log(signin);
       let payload = {
         username: signin.user.displayName,
         email: signin.user.email,
@@ -31,16 +28,15 @@ function Login() {
   };
 
   const handleLoginSubmit = async (e)=>{
-    e.preventDefault();
-    let payload = {email: email, password: password };
-      try{
-        let req = await Api.login(payload);
-        console.log(req)
-        changeUserAuth(true)
-
-      }catch(err){
-        console.log(err)
-      }
+    try {
+      await auth.signInWithEmailAndPassword(email,password);
+      let payload ={email:email}
+      await Api.setToken(payload)
+      setEmail('')
+      setPassword('')
+    } catch (error) {
+      console.log(error)
+    }
 
   }
 

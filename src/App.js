@@ -10,8 +10,6 @@ import Login from "./components/Login";
 import Spinner from "react-spinkit";
 import BookMarkedList from "./components/BookMarkedList";
 import Loading from "./components/Loading";
-import AuthContext from "./context/UserProvider/context";
-import UserInfoContext from "./context/UserInfoProvider/context";
 import Api from "./util/api.util";
 import Channel from "./components/Channel";
 import Threads from "./components/Threads";
@@ -20,58 +18,37 @@ import Inbox from "./components/Inbox";
 
 function App() {
   const [user, loading] = useAuthState(auth);
-  const [userAuth, setUserAuth] = useState(false);
-  const [userInfo, setUserInfo] = useState(null);
 
-  const changeUserAuth = (value) => {
-    setUserAuth(value);
-  };
-
-  const getUserInfo = async () => {
-    try {
-      let req = await Api.getUserInfo();
-      req.data.user && setUserInfo(req.data.user);
-      console.log("user", req.data.user);
-      return req.data.user;
-    } catch (err) {
-      console.log(err.message);
-    }
-  };
 
   if (loading) {
     return <Loading />;
   }
 
   return (
-    <AuthContext.Provider
-      value={{ userAuth: userAuth, changeUserAuth: changeUserAuth }}
-    >
-      <UserInfoContext.Provider
-        value={{ userInfo: userInfo, getUserInfo: getUserInfo }}
-      >
-        <div className="App">
-          <Router>
-            {user || userAuth ? (
-              <>
-                <Header />
-                <AppBody>
-                  <SideBar />
-                  <Switch>
-                    <Route exact path="/" component={Threads}/>
-                    <Route exact path="/bookmarks" component={BookMarkedList}/>
-                    <Route path="/channel/:channelId" exact component={Channel}/>
-                    <Route path='/channel/private/:channelId' component={PrivateChannel}/>
-                    <Route path='/inbox' component={Inbox}/>
-                  </Switch>
-                </AppBody>
-              </>
-            ) : (
-              <Login />
-            )}
-          </Router>
-        </div>
-      </UserInfoContext.Provider>
-    </AuthContext.Provider>
+    <div className="App">
+      <Router>
+        {user ? (
+          <>
+            <Header />
+            <AppBody>
+              <SideBar />
+              <Switch>
+                <Route exact path="/" component={Threads} />
+                <Route exact path="/bookmarks" component={BookMarkedList} />
+                <Route path="/channel/:channelId" exact component={Channel} />
+                <Route
+                  path="/channel/private/:channelId"
+                  component={PrivateChannel}
+                />
+                <Route path="/inbox" component={Inbox} />
+              </Switch>
+            </AppBody>
+          </>
+        ) : (
+          <Login />
+        )}
+      </Router>
+    </div>
   );
 }
 

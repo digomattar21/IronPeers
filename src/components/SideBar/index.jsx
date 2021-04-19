@@ -17,7 +17,6 @@ import AddIcon from "@material-ui/icons/Add";
 import { auth, db } from "../../firebase";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { Link } from "@material-ui/core";
-import AuthContext from "../../context/UserProvider/context";
 import Api from "../../util/api.util";
 import CreateChannelModal from "../CreateChannelModal";
 
@@ -25,7 +24,6 @@ function SideBar(props) {
   const [addChannelInputBool, setAddChannelInputBool] = useState(false);
   const [message, setMessage] = useState(null);
   const [user] = useAuthState(auth);
-  const { userAuth, changeUserAuth } = useContext(AuthContext);
   const [username, setUsername] = useState(null);
   const [joinedChannels, setJoinedChannels] = useState([]);
   const [favoriteChannels, setFavoriteChannels] = useState([]);

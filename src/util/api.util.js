@@ -1,4 +1,5 @@
 import axios from "axios";
+import { auth } from "../firebase";
 
 class Api {
   constructor() {
@@ -8,10 +9,14 @@ class Api {
     });
 
     this.api.interceptors.request.use((config) => {
-      if (typeof window !== "undefined") {
         const token = localStorage.getItem("token");
-        config.headers.Authorization = `Bearer ${token}`;
-      }
+        console.log(localStorage.length)
+        config.headers ={
+          Authorization: `Bearer ${token}`
+        };
+        console.log(config.headers)
+        console.log(`API TOKEN: ${token}`)
+      
       return config;
     });
 
@@ -22,39 +27,21 @@ class Api {
       (error) => {
         if (typeof window !== "undefined") {
           localStorage.removeItem("token");
-          if (
-            error.response.data.message !== '"Token inválido ou expirado"' &&
-            error.response.data.message !== "Token inválido ou expirado" &&
-            error.response.data.message !== '"req sem token' &&
-            error.response.data.message !== "req sem token" 
-          ){
-            throw JSON.stringify(error.response.data.message);
-          }else{
-            console.log(error.response.data.message)
-          }
+          auth.signOut()
+          throw JSON.stringify(error.response.data.message);
         }
       }
     );
   }
 
-  async login(payload) {
-    try {
-      let request = await this.api.post("/auth/login", payload);
-      console.log("req", request);
-      localStorage.setItem("token", request.data.token);
-      return request;
-    } catch (error) {
-      throw error;
-    }
-  }
 
-  async signup(payload) {
+  async signUpWithEmail(payload){
     try {
-      let request = await this.api.post("/auth/signup", payload);
-      localStorage.setItem("token", request.data.token);
-      return request.data.token;
-    } catch (err) {
-      throw err;
+      let req = await this.api.post('/auth/signup/email', payload);
+      req.data && localStorage.setItem('token', req.data.token)
+      return req
+    } catch (error) {
+      throw error
     }
   }
 
@@ -71,10 +58,22 @@ class Api {
 
   }
 
+  async setToken(payload){
+    try {
+      let req = await this.api.post('/private/signin/email', payload);
+      localStorage.setItem("token", req.data.token)
+      return req
+    } catch (error) {
+      throw error
+    }
+  }
+
+  
+
   async signUpWithGoogle(payload) {
     try {
-      let req = await this.api.post("/auth/signupwithgoogle", payload);
-      req.data.token && localStorage.setItem("token", req.data.token);
+      let req = await this.api.post("/auth/signup/google", payload);
+      localStorage.setItem("token", req.data.token);
       return req;
     } catch (error) {
       throw error;
@@ -83,7 +82,7 @@ class Api {
 
   async getUserInfo(){
     try{
-      let req = await this.api.get('/user/getinfo')
+      let req = await this.api.get('/private/user/getinfo')
       return req
     }catch(err){
       console.log(err)
@@ -92,7 +91,7 @@ class Api {
 
   async addGlobalChannel(payload) {
     try {
-      let req = await this.api.post("/channels/createglobal", payload);
+      let req = await this.api.post("/private/channels/createglobal", payload);
       return req;
     } catch (error) {
       throw error;
@@ -101,7 +100,7 @@ class Api {
 
   async addPrivateChannel(payload) {
     try {
-      let req = await this.api.post("/channels/createprivate", payload);
+      let req = await this.api.post("/private/channels/createprivate", payload);
       return req
     } catch (error) {
       throw error;
@@ -110,7 +109,7 @@ class Api {
 
   async getPrivateChannelPinnedMessages(channelId) {
     try {
-      let req = await this.api.get(`/channels/private/getpinnedmessages/${channelId}`);
+      let req = await this.api.get(`/private/channels/private/getpinnedmessages/${channelId}`);
       return req;
     } catch (error) {
       throw error;
@@ -119,7 +118,7 @@ class Api {
 
   async bookMarkMessage(payload) {
     try {
-      let req = await this.api.post("/channels/bookmarkmessage", payload);
+      let req = await this.api.post("/private/channels/bookmarkmessage", payload);
       return req;
     } catch (error) {
       throw error;
@@ -128,7 +127,7 @@ class Api {
 
   async bookMarkPrivateMessage(payload) {
     try {
-      let req = await this.api.post("/channels/private/bookmarkmessage", payload);
+      let req = await this.api.post("/private/channels/private/bookmarkmessage", payload);
       return req;
     } catch (error) {
       throw error;
@@ -139,7 +138,7 @@ class Api {
   async getChannelBookMarkedMessages(channelId) {
     try {
       let req = await this.api.get(
-        `/channels/getbookmarkedmessages/${channelId}`
+        `/private/channels/getbookmarkedmessages/${channelId}`
       );
       return req.data;
     } catch (error) {
@@ -149,7 +148,7 @@ class Api {
 
   async addUserBookMark(payload) {
     try {
-      let req = await this.api.post("/user/adduserbookmark", payload);
+      let req = await this.api.post("/private/user/adduserbookmark", payload);
       console.log(req);
       return req;
     } catch (error) {
@@ -159,7 +158,7 @@ class Api {
 
   async addPrivateUserBookMark(payload){
     try {
-      let req = await this.api.post("/user/adduserprivatebookmark", payload);
+      let req = await this.api.post("/private/user/adduserprivatebookmark", payload);
       console.log(req);
       return req;
     } catch (error) {
@@ -169,7 +168,7 @@ class Api {
 
   async getUserBookmarks(email) {
     try {
-      let req = await this.api.post("/user/getuserbookmarks", { email: email });
+      let req = await this.api.post("/private/user/getuserbookmarks", { email: email });
       return req.data;
     } catch (error) {
       throw error;
@@ -187,7 +186,7 @@ class Api {
 
   async pinMessage(payload) {
     try {
-      let req = await this.api.post("/channel/pinmessage", payload);
+      let req = await this.api.post("/private/channel/pinmessage", payload);
       return req;
     } catch (error) {
       throw error;
@@ -195,7 +194,7 @@ class Api {
   }
   async pinPrivateMessage(payload) {
     try {
-      let req = await this.api.post("/channel/private/pinmessage", payload);
+      let req = await this.api.post("/private/channel/private/pinmessage", payload);
       return req;
     } catch (error) {
       throw error;
@@ -205,7 +204,7 @@ class Api {
 
   async getPinnedMessages(channelId) {
     try {
-      let req = await this.api.get(`/channels/getpinnedmessages/${channelId}`);
+      let req = await this.api.get(`/private/channels/getpinnedmessages/${channelId}`);
       return req;
     } catch (error) {
       throw error;
@@ -214,7 +213,7 @@ class Api {
 
   async getChannelMembersLength(channelId){
     try {
-      let req = await this.api.get(`/channels/getchannelmemberslength/${channelId}`);
+      let req = await this.api.get(`/private/channels/getchannelmemberslength/${channelId}`);
       return req;
     } catch (error) {
       throw error;
@@ -223,7 +222,7 @@ class Api {
 
   async getPrivateChannelMembersLength(channelId){
     try {
-      let req = await this.api.get(`/channels/private/getchannelmemberslength/${channelId}`);
+      let req = await this.api.get(`/private/channels/private/getchannelmemberslength/${channelId}`);
       return req;
     } catch (error) {
       throw error;
@@ -232,7 +231,7 @@ class Api {
 
   async userJoinChannel(payload){
     try {
-        let req = await this.api.post('/user/joinchannel', payload);
+        let req = await this.api.post('/private/user/joinchannel', payload);
         console.log(req);
         return req
 
@@ -243,7 +242,7 @@ class Api {
 
   async getUserChannels(payload){
     try {
-      let req = await this.api.post('/user/getuserchannels',payload)
+      let req = await this.api.post('/private/user/getuserchannels',payload)
       return req
     } catch (error) {
       throw error
@@ -252,7 +251,7 @@ class Api {
 
   async setFavoriteChannel(payload){
     try {
-      let req = await this.api.post('/user/setfavoritechannel', payload);
+      let req = await this.api.post('/private/user/setfavoritechannel', payload);
       return req
     } catch (error) {
       throw error
@@ -262,7 +261,7 @@ class Api {
   async sendPrivateChannelInvite(payload) {
 
     try {
-      let req = await this.api.post('/user/sendprivatechannelinvite', payload);
+      let req = await this.api.post('/private/user/sendprivatechannelinvite', payload);
       return req
 
     } catch (error) {
@@ -273,7 +272,7 @@ class Api {
 
   async getUserInboxInfo(payload){
     try {
-        let req = await this.api.post('/user/inbox/getinfo', payload)
+        let req = await this.api.post('/private/user/inbox/getinfo', payload)
         return req
     } catch (error) {
       throw error
@@ -282,7 +281,7 @@ class Api {
 
   async getInviteInfo(payload){
     try {
-      let req = await this.api.post('/user/invites/getinfo', payload);
+      let req = await this.api.post('/private/user/invites/getinfo', payload);
       return req
     } catch (error) {
       throw error
@@ -291,7 +290,7 @@ class Api {
 
   async userJoinPrivateChannel(payload){
     try {
-      let req = await this.api.post('/user/channel/private/joinprivatechannel', payload);
+      let req = await this.api.post('/private/user/channel/private/joinprivatechannel', payload);
       return req
     } catch (error) {
       throw error
@@ -300,7 +299,7 @@ class Api {
 
   async deleteInvite(payload){
     try {
-      return await this.api.post('/user/invite/deleteone', payload);
+      return await this.api.post('/private/user/invite/deleteone', payload);
     } catch (error) {
       throw error
     }
@@ -308,7 +307,7 @@ class Api {
 
   async setUnreadFalse(payload){
     try {
-      let req = await this.api.post('/user/inbox/sethasunreadfalse', payload);
+      let req = await this.api.post('/private/user/inbox/sethasunreadfalse', payload);
       return req
     } catch (error) {
       throw error
