@@ -50,7 +50,6 @@ function SideBar(props) {
     let payload = { userEmail: user.email };
     try {
       let req = await Api.getUserChannels(payload);
-      console.log(req)
       setJoinedChannels(req.data.joinedChannels);
       setFavoriteChannels(req.data.favoriteChannels);
       setPrivateChannels(req.data.privateChannels);
