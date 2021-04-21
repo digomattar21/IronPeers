@@ -1,8 +1,42 @@
-import React from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 import LockIcon from '@material-ui/icons/Lock';
+import axios from "axios";
+import fileDownload from 'js-file-download';
+import InsertDriveFileIcon from "@material-ui/icons/InsertDriveFile";
+
+
 
 function BookmarkedCard({ bookmark }) {
+  const [error, setError] = useState(null)
+
+
+  const checkFileType = (url) => {
+    let questionMarkIndex = url.indexOf("?");
+    let stringSliced = url.substring(0, questionMarkIndex);
+    let isImg =
+      stringSliced.endsWith(".jpg") ||
+      stringSliced.endsWith(".gif") ||
+      stringSliced.endsWith(".png") ||
+      stringSliced.endsWith(".jpeg");
+    let end = stringSliced.slice(questionMarkIndex - 3, questionMarkIndex);
+    return [isImg, end];
+  };
+
+
+  const downloadFile = async () => {
+    if (bookmark.fileURL.length > 0) {
+     try {
+      let req = await axios.get(bookmark.fileURL, {responseType: "blob"});
+      fileDownload(req.data, 'download');
+     } catch (error) {
+        setError('Unable to download');
+        console.log(error?.message)
+     }
+    }}
+
+
+
   return (
     <BookMarkedCardContainer>
       <BookmarkContainer>
@@ -21,6 +55,31 @@ function BookmarkedCard({ bookmark }) {
             {bookmark.messageOwner} <span>{(bookmark.createdAt.split('T')[0])} {bookmark.createdAt.split('T')[1].slice(0,-2)}</span>
           </h4>
           <p>{bookmark.message}</p>
+          {bookmark.fileURL.length>0 && (
+            <FileDownloadContainer>
+              {checkFileType(bookmark.fileURL)[0] ? (
+                <img
+                  src={bookmark.fileURL}
+                  alt=""
+                  style={{
+                    maxHeight: "200px",
+                    maxWidth: "400px",
+                    padding: "10px",
+                  }}
+                />
+              ) : (
+                <div>
+                  <InsertDriveFileIcon
+                    className="fileIcon"
+                    onClick={() => downloadFile()}
+                  />
+                  {/* <GetAppIcon className='downloadIcon'/> */}
+                  <h4>.{checkFileType(bookmark.fileURL)[1]}</h4>
+                  {error && <h4 style={{color:'red'}}>{error}</h4>}
+                </div>
+              )}
+            </FileDownloadContainer>
+          )}
         </BookmarkInfo>
       </BookmarkContainer>
     </BookMarkedCardContainer>
@@ -44,6 +103,10 @@ const BookMarkedCardContainer = styled.div`
     font-weight: 200;
   }
 `;
+
+const FileDownloadContainer = styled.div`
+
+`
 
 const BookmarkContainer = styled.div`
   display: flex;
