@@ -45,6 +45,7 @@ function Message({
           email: userState.email,
           messageOwner: user,
           channelName: channelName,
+          imgUrl: fileDownloadUrl || ""
         };
         if (Private == true) {
           let updatedPrivateUserBookmarks = await Api.addPrivateUserBookMark(
@@ -202,7 +203,7 @@ const MessageIconsContainer = styled.div`
       cursor: pointer;
       transform: scale(1.2)
     }
-    
+  }
 `;
 
 const MessageLeftContainer = styled.div`

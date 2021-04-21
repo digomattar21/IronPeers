@@ -5,8 +5,15 @@ import { auth, db, storage } from "../../firebase";
 import firebase from "firebase";
 import { useAuthState } from "react-firebase-hooks/auth";
 import BackupIcon from "@material-ui/icons/Backup";
-import InsertDriveFileIcon from '@material-ui/icons/InsertDriveFile';
-import CancelIcon from '@material-ui/icons/Cancel';
+import InsertDriveFileIcon from "@material-ui/icons/InsertDriveFile";
+import CancelIcon from "@material-ui/icons/Cancel";
+import EmojiEmotionsIcon from "@material-ui/icons/EmojiEmotions";
+import Picker, {
+  SKIN_TONE_MEDIUM_DARK,
+  SKIN_TONE_NEUTRAL,
+  SKIN_TONE_LIGHT,
+} from "emoji-picker-react";
+import EmojiPicker from "emoji-picker-react";
 
 function ChatInput({ channelName, channelId, chatBottomRef, Private }) {
   const [message, setMessage] = useState("");
@@ -14,6 +21,8 @@ function ChatInput({ channelName, channelId, chatBottomRef, Private }) {
   const [user] = useAuthState(auth);
   const inputFileRef = useRef(null);
   const [hasFile, setHasFile] = useState(false);
+  const [chosenEmoji, setChosenEmoji] = useState(null);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
 
   const sendMessage = async (e) => {
     e.preventDefault();
@@ -24,8 +33,7 @@ function ChatInput({ channelName, channelId, chatBottomRef, Private }) {
     if (message.length >= 1 && !fileUrl) {
       try {
         if (Private == true) {
-          console.log('soh mensagem')
-         await db
+          await db
             .collection("privaterooms")
             .doc(channelId)
             .collection("messages")
@@ -55,39 +63,32 @@ function ChatInput({ channelName, channelId, chatBottomRef, Private }) {
       });
 
       setMessage("");
-    }else if (fileUrl){
-      console.log('com mensagem e iamgem')
-      console.log(message)
+    } else if (fileUrl) {
       if (Private == true) {
         await db
-           .collection("privaterooms")
-           .doc(channelId)
-           .collection("messages")
-           .add({
-             message: message,
-             timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-             user: user?.displayName,
-             userImage: user?.photoURL,
-             fileDownloadUrl: fileUrl
-           });
-           setFileUrl(null);
-           setHasFile(false)
-       } else {
-         await db
-           .collection("rooms")
-           .doc(channelId)
-           .collection("messages")
-           .add({
-             message: message,
-             timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-             user: user?.displayName,
-             userImage: user?.photoURL,
-             fileDownloadUrl: fileUrl
-           });
-           setFileUrl(null);
-           setHasFile(false)
-       }
-
+          .collection("privaterooms")
+          .doc(channelId)
+          .collection("messages")
+          .add({
+            message: message,
+            timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+            user: user?.displayName,
+            userImage: user?.photoURL,
+            fileDownloadUrl: fileUrl,
+          });
+        setFileUrl(null);
+        setHasFile(false);
+      } else {
+        await db.collection("rooms").doc(channelId).collection("messages").add({
+          message: message,
+          timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+          user: user?.displayName,
+          userImage: user?.photoURL,
+          fileDownloadUrl: fileUrl,
+        });
+        setFileUrl(null);
+        setHasFile(false);
+      }
     }
   };
 
@@ -99,7 +100,7 @@ function ChatInput({ channelName, channelId, chatBottomRef, Private }) {
       await fileRef.put(file);
       setFileUrl(await fileRef.getDownloadURL());
       setHasFile(true);
-      console.log(fileUrl)
+      console.log(fileUrl);
     } catch (err) {
       console.log(err);
     }
@@ -117,22 +118,37 @@ function ChatInput({ channelName, channelId, chatBottomRef, Private }) {
     inputFileRef.current.click();
   };
 
+  const handlePickEmoji = (event, emojiObject) => {
+    setChosenEmoji(emojiObject);
+    setShowEmojiPicker(false);
+    setMessage(`${message} ${emojiObject.emoji}`)
+  };
+
   return (
     <ChatInputContainer>
       <form>
         <FormContainer>
+          <EmojiInputContainer
+            onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+          >
+            {!showEmojiPicker && (
+              <Button variant="contained" size="small">
+              <EmojiEmotionsIcon className="emoji-icon" />
+            </Button>
+            )}
+            {showEmojiPicker && <Picker onEmojiClick={handlePickEmoji} />}
+          </EmojiInputContainer>
           <input
             className="textInput"
             onChange={(e) => handleChange(e)}
             value={message}
             placeholder={`Message #${channelName}`}
-          >
-          </input>
+          ></input>
           {hasFile && (
             <>
-            <InsertDriveFileIcon className='fileIcon'/>
-            <CancelIcon className="cancelIcon"/>
-           </>
+              <InsertDriveFileIcon className="fileIcon" />
+              <CancelIcon className="cancelIcon" />
+            </>
           )}
           <ControlsContainer>
             <Button
@@ -152,6 +168,14 @@ function ChatInput({ channelName, channelId, chatBottomRef, Private }) {
                 hidden
               ></input>
             </Button>
+            <EmojiInputContainer
+            onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+          >
+            <Button variant="contained" size="small">
+              <EmojiEmotionsIcon className="emoji-icon" />
+            </Button>
+            {showEmojiPicker && <Picker onEmojiClick={handlePickEmoji} />}
+          </EmojiInputContainer>
           </ControlsContainer>
         </FormContainer>
         <Button hidden type="submit" onClick={(e) => sendMessage(e)} />
@@ -177,9 +201,11 @@ const ControlsContainer = styled.div`
   }
 `;
 
-
-
-
+const EmojiInputContainer = styled.div`
+  position: fixed;
+  bottom: 40px;
+  right: 5%;
+`;
 
 const FormContainer = styled.div`
   position: fixed;
@@ -194,25 +220,21 @@ const FormContainer = styled.div`
     outline: none;
     width: 50vw;
   }
-  
-  .fileIcon{
-    color:blue;
+
+  .fileIcon {
+    color: blue;
     font-size: 32px;
     margin-bottom: 2.5%;
-    
   }
 
-  .cancelIcon{
+  .cancelIcon {
     color: red;
     margin-bottom: 4%;
-    :hover{
+    :hover {
       transform: scale(1.1);
-      cursor:pointer;
+      cursor: pointer;
     }
-    
   }
-
-
 `;
 
 const ChatInputContainer = styled.div`
@@ -223,9 +245,4 @@ const ChatInputContainer = styled.div`
     justify-content: center;
     align-items: center;
   }
-  /* > form > .fileInput {
-    position: fixed;
-    right: 10%;
-    bottom: 3.5%;
-  } */
 `;
