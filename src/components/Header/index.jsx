@@ -9,17 +9,21 @@ import { auth } from "../../firebase";
 import { useAuthState } from "react-firebase-hooks/auth";
 import ArrowBackIcon from "@material-ui/icons/ArrowBack";
 import ArrowForwardIcon from "@material-ui/icons/ArrowForward";
+import { useHistory } from "react-router";
+
 
 function Header() {
   const [user] = useAuthState(auth);
+  const history = useHistory()
 
   return (
     <HeaderContainer>
       <HeaderLeft>
         <HeaderAvatar alt={user?.displayName} src={user?.photoURL} />
+        
         <div className="arrowsContainer">
-          <ArrowBackIcon />
-          <ArrowForwardIcon />
+          <ArrowBackIcon onClick={()=>history.goBack()}/>
+          <ArrowForwardIcon onClick={()=>history.goForward()}/>
         </div>
 
         <AccessTimeIcon />
@@ -62,6 +66,13 @@ const HeaderLeft = styled.div`
   }
   .arrowsContainer{
       margin-left: 45%;
+      >.MuiSvgIcon-root{
+        margin-left: 7px;
+        :hover{
+          cursor:pointer;
+          transform: scale(1.2)
+        }
+      }
   }
 `;
 

@@ -103,7 +103,7 @@ function Channel() {
             <>
               <ChatMessages>
                 {roomMessages?.docs.map((doc) => {
-                  const { message, timestamp, user, userImage } = doc.data();
+                  const { message, timestamp, user, userImage, fileDownloadUrl } = doc.data();
                   return (
                     <Message
                       key={doc.id}
@@ -114,6 +114,7 @@ function Channel() {
                       userImage={userImage}
                       channelId={channelId}
                       channelName={roomDetails?.data().name}
+                      fileDownloadUrl={fileDownloadUrl}
                     />
                   );
                 })}
