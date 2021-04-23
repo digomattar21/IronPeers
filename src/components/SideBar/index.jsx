@@ -213,6 +213,7 @@ const SideBarContainer = styled.div`
   border-top: 1px solid var(--ironblue-color);
   max-width: 260px;
   margin-top: 44px;
+  overflow-y: scroll;
 
   > hr {
     margin-top: 10px;
