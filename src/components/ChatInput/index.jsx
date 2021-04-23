@@ -44,6 +44,9 @@ function ChatInput({ channelName, channelId, chatBottomRef, Private }) {
               timestamp: firebase.firestore.FieldValue.serverTimestamp(),
               user: user?.displayName,
               userImage: user?.photoURL,
+              fileDownloadUrl: '',
+              replies:[],
+              likes: [],
             });
         } else {
           await db
@@ -55,6 +58,10 @@ function ChatInput({ channelName, channelId, chatBottomRef, Private }) {
               timestamp: firebase.firestore.FieldValue.serverTimestamp(),
               user: user?.displayName,
               userImage: user?.photoURL,
+              fileDownloadUrl: '',
+              replies:[],
+              likes: [],
+            
             });
         }
       } catch (err) {
@@ -77,6 +84,8 @@ function ChatInput({ channelName, channelId, chatBottomRef, Private }) {
             user: user?.displayName,
             userImage: user?.photoURL,
             fileDownloadUrl: fileUrl,
+            replies:[],
+            likes: [],
           });
         setFileUrl(null);
         setHasFile(false);
@@ -87,6 +96,8 @@ function ChatInput({ channelName, channelId, chatBottomRef, Private }) {
           user: user?.displayName,
           userImage: user?.photoURL,
           fileDownloadUrl: fileUrl,
+          replies:[],
+          likes:[]
         });
         setFileUrl(null);
         setHasFile(false);

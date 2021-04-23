@@ -6,6 +6,7 @@ import BookmarkBorderIcon from "@material-ui/icons/BookmarkBorder";
 import LabelImportantIcon from "@material-ui/icons/LabelImportant";
 import FavoriteBorderIcon from "@material-ui/icons/FavoriteBorder";
 import InsertDriveFileIcon from "@material-ui/icons/InsertDriveFile";
+import CloseIcon from '@material-ui/icons/Close';
 import Api from "../../util/api.util";
 import { Redirect, useHistory } from "react-router";
 import axios from 'axios'
@@ -21,6 +22,8 @@ function Message({
   channelName,
   Private,
   fileDownloadUrl,
+  replies,
+  likes
 }) {
   const [userState] = useAuthState(auth);
   const [iconsShow, setIconsShow] = useState(false);
@@ -104,9 +107,28 @@ function Message({
         console.log(error?.message)
      }
     }
-
-
   };
+
+  const handleLikeClick = () =>{
+    if (likes.includes(userState.email)){
+      return 
+    }
+    let newLikesArray = [...likes]
+    newLikesArray.push(userState.email)
+    console.log(newLikesArray)
+    db.collection(Private?'privaterooms':'rooms').doc(channelId).collection('messages').doc(id).set({
+      likes: newLikesArray
+    },{merge: true})
+
+  }
+
+  const handleDeleteClick= (e)=>{
+    console.log(user, userState.displayName)
+    if(user === userState.displayName){
+      db.collection(Private?'privaterooms':'rooms').doc(channelId).collection('messages').doc(id).delete()
+
+    }
+  }
 
   return (
     <MessageContainer
@@ -145,15 +167,26 @@ function Message({
               )}
             </FileDownloadContainer>
           )}
+          <MessageActionsContainer>
+              <div>
+                <FavoriteBorderIcon onClick={(e)=>handleLikeClick(e)}/>
+                <h4>{likes?.length}</h4>
+              </div>
+              <div>
+                reply
+              </div>
+          </MessageActionsContainer>
         </MessageInfo>
       </MessageLeftContainer>
       <MessageRightContainer>
         {iconsShow && (
           <MessageIconsContainer>
             <BookmarkBorderIcon onClick={(e) => handleBookmarkClick(e)} />
-            <FavoriteBorderIcon />
+            <FavoriteBorderIcon onClick={(e)=>handleLikeClick(e)}/>
 
             <LabelImportantIcon onClick={(e) => handlePinClick(e)} />
+            <CloseIcon onClick={(e) => handleDeleteClick(e)}/>
+
           </MessageIconsContainer>
         )}
       </MessageRightContainer>
@@ -178,6 +211,25 @@ const FileDownloadContainer = styled.div`
 
     > h4 {
       margin-left: 50px;
+    }
+  }
+`;
+
+const MessageActionsContainer = styled.div`
+  margin-top: 6px;
+  display: flex;
+  justify-content: space-around;
+  >div{
+    display: flex;
+    justify-content: center;
+    align-items:center;
+    color: var(--ironblue-color);
+    >.MuiSvgIcon-root{
+      color: var(--ironblue-color);
+      :hover{
+        cursor: pointer;
+        transform: scale(1.1)
+      }
     }
   }
 `;
