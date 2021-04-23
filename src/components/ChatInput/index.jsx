@@ -8,6 +8,7 @@ import BackupIcon from "@material-ui/icons/Backup";
 import InsertDriveFileIcon from "@material-ui/icons/InsertDriveFile";
 import CancelIcon from "@material-ui/icons/Cancel";
 import EmojiEmotionsIcon from "@material-ui/icons/EmojiEmotions";
+import CachedIcon from "@material-ui/icons/Cached";
 import Picker, {
   SKIN_TONE_MEDIUM_DARK,
   SKIN_TONE_NEUTRAL,
@@ -23,6 +24,7 @@ function ChatInput({ channelName, channelId, chatBottomRef, Private }) {
   const [hasFile, setHasFile] = useState(false);
   const [chosenEmoji, setChosenEmoji] = useState(null);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [loadingState, setLoadingState] = useState(false);
 
   const sendMessage = async (e) => {
     e.preventDefault();
@@ -94,6 +96,7 @@ function ChatInput({ channelName, channelId, chatBottomRef, Private }) {
 
   const onFileChange = async (e) => {
     try {
+      setLoadingState(true)
       const file = e.target.files[0];
       const storageRef = storage.ref();
       const fileRef = storageRef.child(file.name);
@@ -101,6 +104,7 @@ function ChatInput({ channelName, channelId, chatBottomRef, Private }) {
       setFileUrl(await fileRef.getDownloadURL());
       setHasFile(true);
       console.log(fileUrl);
+      setLoadingState(false)
     } catch (err) {
       console.log(err);
     }
@@ -123,6 +127,11 @@ function ChatInput({ channelName, channelId, chatBottomRef, Private }) {
     setShowEmojiPicker(false);
     setMessage(`${message} ${emojiObject.emoji}`)
   };
+
+  const handleCancelFile = () =>{
+    setFileUrl(null);
+    setHasFile(false);
+  }
 
   return (
     <ChatInputContainer>
@@ -147,8 +156,13 @@ function ChatInput({ channelName, channelId, chatBottomRef, Private }) {
           {hasFile && (
             <>
               <InsertDriveFileIcon className="fileIcon" />
-              <CancelIcon className="cancelIcon" />
+              <CancelIcon className="cancelIcon" onClick={()=>handleCancelFile()}/>
             </>
+          )}
+          {loadingState && !hasFile && (
+              <>
+                <CachedIcon className='fileIcon' />
+              </>
           )}
           <ControlsContainer>
             <Button
@@ -222,7 +236,13 @@ const FormContainer = styled.div`
   }
 
   .fileIcon {
-    color: blue;
+    color: var(--ironblue-color);
+    font-size: 32px;
+    margin-bottom: 2.5%;
+  }
+
+  .cachedIcon{
+    color: var(--ironblue-color);
     font-size: 32px;
     margin-bottom: 2.5%;
   }

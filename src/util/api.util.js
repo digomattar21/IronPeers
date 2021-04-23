@@ -314,6 +314,16 @@ class Api {
     }
   }
 
+  async removeBookmarkedMessage(payload){
+    try {
+      let req = await this.api.post('/private/user/removebookmarkedmessage', payload);
+      console.log(req)
+      return req
+    } catch (error) {
+      throw error
+    }
+  }
+
 
 }
 
