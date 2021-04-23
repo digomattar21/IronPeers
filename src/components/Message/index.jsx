@@ -6,7 +6,6 @@ import BookmarkBorderIcon from "@material-ui/icons/BookmarkBorder";
 import LabelImportantIcon from "@material-ui/icons/LabelImportant";
 import FavoriteBorderIcon from "@material-ui/icons/FavoriteBorder";
 import InsertDriveFileIcon from "@material-ui/icons/InsertDriveFile";
-import GetAppIcon from "@material-ui/icons/GetApp";
 import Api from "../../util/api.util";
 import { Redirect, useHistory } from "react-router";
 import axios from 'axios'
@@ -26,7 +25,9 @@ function Message({
   const [userState] = useAuthState(auth);
   const [iconsShow, setIconsShow] = useState(false);
   const history = useHistory();
-  const [error, setError] = useState(null)
+  const [error, setError] = useState(null);
+
+
 
   const handleBookmarkClick = async (e) => {
     const payload = { channelId: channelId, firebaseId: id, message: message };
@@ -38,6 +39,7 @@ function Message({
         req = await Api.bookMarkMessage(payload);
       }
       if (userState.email) {
+        console.log(fileDownloadUrl)
         const newPayload = {
           channelId: channelId,
           messageFirebaseId: id,
@@ -45,7 +47,7 @@ function Message({
           email: userState.email,
           messageOwner: user,
           channelName: channelName,
-          imgUrl: fileDownloadUrl || ""
+          fileURL: fileDownloadUrl || ""
         };
         if (Private == true) {
           let updatedPrivateUserBookmarks = await Api.addPrivateUserBookMark(

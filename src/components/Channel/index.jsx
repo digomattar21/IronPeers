@@ -43,11 +43,12 @@ function Channel() {
   const handleDetailsClick = async (e) => {
     try {
       if (channelId) {
+        setButtonForExit(true);
         let req = await Api.getPinnedMessages(channelId);
         let messageIds = req.data.messageFirebaseIds;
         setPinnedMessages(messageIds);
         setDisplayDetails(true);
-        setButtonForExit(true);
+        
       }
     } catch (error) {
       console.log(error);
@@ -124,7 +125,7 @@ function Channel() {
             </>
           )}
           {displayDetails && (
-            <RoomDetails messageIds={pinnedMessages} channelId={channelId} />
+            <RoomDetails messageIds={pinnedMessages} channelId={channelId} isPrivate={false} />
           )}
 
           <ChatInput

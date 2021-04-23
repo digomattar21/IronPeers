@@ -46,6 +46,7 @@ function PrivateChannel() {
       if (channelId) {
         let req = await Api.getPrivateChannelPinnedMessages(channelId);
         let messageIds = req.data.messageFirebaseIds;
+        console.log(messageIds)
         setPinnedMessages(messageIds);
         setDisplayDetails(true);
         setButtonForExit(true);
@@ -150,7 +151,7 @@ function PrivateChannel() {
             </>
           )}
           {displayDetails && (
-            <RoomDetails messageIds={pinnedMessages} channelId={channelId} />
+            <RoomDetails messageIds={pinnedMessages} channelId={channelId} isPrivate={true} />
           )}
 
           <ChatInput
