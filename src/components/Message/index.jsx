@@ -1,16 +1,26 @@
 import React, { useEffect, useState } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
-import styled from "styled-components";
+import styled, { keyframes } from "styled-components";
 import { auth, db } from "../../firebase";
 import BookmarkBorderIcon from "@material-ui/icons/BookmarkBorder";
 import LabelImportantIcon from "@material-ui/icons/LabelImportant";
 import FavoriteBorderIcon from "@material-ui/icons/FavoriteBorder";
 import InsertDriveFileIcon from "@material-ui/icons/InsertDriveFile";
-import CloseIcon from '@material-ui/icons/Close';
+import CloseIcon from "@material-ui/icons/Close";
 import Api from "../../util/api.util";
 import { Redirect, useHistory } from "react-router";
-import axios from 'axios'
-import fileDownload from 'js-file-download'
+import axios from "axios";
+import fileDownload from "js-file-download";
+import CachedIcon from "@material-ui/icons/Cached";
+import firebase from "firebase";
+import AddCommentIcon from '@material-ui/icons/AddComment';
+import MessageReply from "../MesssageReply";
+import { Button } from "@material-ui/core";
+import ReplyInput from "../ReplyInput";
+import ExpandLessIcon from '@material-ui/icons/ExpandLess';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import { useCollection } from "react-firebase-hooks/firestore";
+
 
 function Message({
   message,
@@ -22,19 +32,34 @@ function Message({
   channelName,
   Private,
   fileDownloadUrl,
-  replies,
-  likes
+  likes,
 }) {
   const [userState] = useAuthState(auth);
   const [iconsShow, setIconsShow] = useState(false);
   const history = useHistory();
   const [error, setError] = useState(null);
+  const [ready, setReady] = useState(true);
+  const [showReplies, setShowReplies] = useState(false);
+  const [replies, setReplies] = useState([]);
+  const [hasReplies, setHasReplies] = useState(false);
+  const [anchorEl, setAnchorEl] = useState(null);
 
 
+  const [messageReplies, loading] = useCollection(
+    channelId &&
+      db
+        .collection(Private?'privaterooms':'rooms')
+        .doc(channelId)
+        .collection("messages")
+        .doc(id)
+        .collection("replies")
+        .orderBy("timestamp", "desc")
+  );
 
   const handleBookmarkClick = async (e) => {
     const payload = { channelId: channelId, firebaseId: id, message: message };
     try {
+      setReady(false);
       let req;
       if (Private == true) {
         req = await Api.bookMarkPrivateMessage(payload);
@@ -42,7 +67,7 @@ function Message({
         req = await Api.bookMarkMessage(payload);
       }
       if (userState.email) {
-        console.log(fileDownloadUrl)
+        console.log(fileDownloadUrl);
         const newPayload = {
           channelId: channelId,
           messageFirebaseId: id,
@@ -50,7 +75,7 @@ function Message({
           email: userState.email,
           messageOwner: user,
           channelName: channelName,
-          fileURL: fileDownloadUrl || ""
+          fileURL: fileDownloadUrl || "",
         };
         if (Private == true) {
           let updatedPrivateUserBookmarks = await Api.addPrivateUserBookMark(
@@ -61,6 +86,9 @@ function Message({
           let updatedUserBookmarks = await Api.addUserBookMark(newPayload);
         }
       }
+      setTimeout(() => {
+        setReady(true);
+      }, 1000);
     } catch (error) {
       console.log(error);
     }
@@ -79,6 +107,7 @@ function Message({
   };
 
   const handlePinClick = async (e) => {
+    setReady(false);
     const payload = {
       channelId: channelId,
       messageFirebaseId: id,
@@ -95,40 +124,76 @@ function Message({
     } catch (err) {
       console.log(err);
     }
+    setReady(true);
   };
 
   const downloadFile = async () => {
-    if (fileDownloadUrl){
-     try {
-      let req = await axios.get(fileDownloadUrl, {responseType: "blob"});
-      fileDownload(req.data, 'download');
-     } catch (error) {
-        setError('Unable to download');
-        console.log(error?.message)
-     }
+    if (fileDownloadUrl) {
+      try {
+        let req = await axios.get(fileDownloadUrl, { responseType: "blob" });
+        fileDownload(req.data, "download");
+      } catch (error) {
+        setError("Unable to download");
+        console.log(error?.message);
+      }
     }
   };
 
-  const handleLikeClick = () =>{
-    if (likes.includes(userState.email)){
-      return 
+  const handleLikeClick = () => {
+    if (likes.includes(userState.email)) {
+      return;
     }
-    let newLikesArray = [...likes]
-    newLikesArray.push(userState.email)
-    console.log(newLikesArray)
-    db.collection(Private?'privaterooms':'rooms').doc(channelId).collection('messages').doc(id).set({
-      likes: newLikesArray
-    },{merge: true})
+    let newLikesArray = [...likes];
+    newLikesArray.push(userState.email);
+    db.collection(Private ? "privaterooms" : "rooms")
+      .doc(channelId)
+      .collection("messages")
+      .doc(id)
+      .set(
+        {
+          likes: newLikesArray,
+        },
+        { merge: true }
+      );
+  };
 
-  }
-
-  const handleDeleteClick= (e)=>{
-    console.log(user, userState.displayName)
-    if(user === userState.displayName){
-      db.collection(Private?'privaterooms':'rooms').doc(channelId).collection('messages').doc(id).delete()
-
+  const handleDeleteClick = (e) => {
+    console.log(user, userState.displayName);
+    if (user === userState.displayName) {
+      db.collection(Private ? "privaterooms" : "rooms")
+        .doc(channelId)
+        .collection("messages")
+        .doc(id)
+        .delete();
     }
-  }
+  };
+
+  const handleOpenReplyInput = () => {
+    setShowReplies(!showReplies);
+    
+  };
+
+
+  const checkReplies = () => {
+    let repliesReq = db.collection(Private ? "privaterooms" : "rooms").doc(channelId).collection('messages').doc(id).collection('replies');
+    repliesReq.get()
+    .then((reply)=>{
+      if (reply.docs.length > 0) {
+        let temp=[]
+        reply.docs.map(doc =>{
+          temp.push(doc.data())
+        })
+        setReplies(temp)
+        setHasReplies(true)
+      }
+    })
+  };
+
+
+
+  useEffect(() => {
+    checkReplies()
+  },[])
 
   return (
     <MessageContainer
@@ -156,37 +221,75 @@ function Message({
                 />
               ) : (
                 <div>
-                  <InsertDriveFileIcon
-                    className="fileIcon"
-                    onClick={() => downloadFile()}
-                  />
+                  <a target="_blank" href={fileDownloadUrl}>
+                    <InsertDriveFileIcon
+                      className="fileIcon"
+                      // onClick={() => downloadFile()}
+                    />
+                  </a>
                   {/* <GetAppIcon className='downloadIcon'/> */}
                   <h4>.{checkFileType(fileDownloadUrl)[1]}</h4>
-                  {error && <h4 style={{color:'red'}}>{error}</h4>}
+                  {error && <h4 style={{ color: "red" }}>{error}</h4>}
                 </div>
               )}
             </FileDownloadContainer>
           )}
           <MessageActionsContainer>
-              <div>
-                <FavoriteBorderIcon onClick={(e)=>handleLikeClick(e)}/>
-                <h4>{likes?.length}</h4>
-              </div>
-              <div>
-                reply
-              </div>
+            <div onClick={() =>handleLikeClick()}>
+              <FavoriteBorderIcon  />
+              <h4>{likes?.length}</h4>
+            </div>
+            <div onClick={() =>handleOpenReplyInput()}>
+              <h5>Reply ({messageReplies?.docs.length})</h5>
+              {showReplies && <ExpandLessIcon />}
+              {!showReplies && <ExpandMoreIcon />}
+            </div>
           </MessageActionsContainer>
+          <RepliesContainer>
+          {showReplies && (
+            <>
+            <ReplyInput hasReplies={hasReplies} isPrivate={Private} id={id} channelId={channelId}/>
+            {messageReplies.docs.map(doc=>{
+              const { message, timestamp, user, userImage, fileDownloadUrl, likes } = doc.data();
+              console.log(fileDownloadUrl)
+              return(
+                <MessageReply 
+                  key={doc.id}
+                  replyId={doc.id}
+                  userImage={userImage}
+                  user={user}
+                  message={message}
+                  fileDownloadUrl={fileDownloadUrl || ""}
+                  timestamp={timestamp}
+                  likes={likes}
+                  channelId={channelId}
+                  id={id}
+                  Private={Private}
+                />
+              )
+            })}
+            </>
+          )}
+          </RepliesContainer>
         </MessageInfo>
       </MessageLeftContainer>
       <MessageRightContainer>
         {iconsShow && (
           <MessageIconsContainer>
-            <BookmarkBorderIcon onClick={(e) => handleBookmarkClick(e)} />
-            <FavoriteBorderIcon onClick={(e)=>handleLikeClick(e)}/>
+            {ready && (
+              <>
+                <BookmarkBorderIcon onClick={(e) => handleBookmarkClick(e)} />
+                <AddCommentIcon onClick={(e) => handleOpenReplyInput(e)} />
 
-            <LabelImportantIcon onClick={(e) => handlePinClick(e)} />
-            <CloseIcon onClick={(e) => handleDeleteClick(e)}/>
-
+                <LabelImportantIcon onClick={(e) => handlePinClick(e)} />
+                <CloseIcon onClick={(e) => handleDeleteClick(e)} />
+              </>
+            )}
+            {!ready && (
+              <>
+                <CachedIcon className="cachedIcon" />
+              </>
+            )}
           </MessageIconsContainer>
         )}
       </MessageRightContainer>
@@ -198,14 +301,16 @@ export default Message;
 
 const FileDownloadContainer = styled.div`
   > div {
-    > .MuiSvgIcon-root {
-      font-size: 80px;
-      color: lightgray;
-      box-shadow: 5px gray;
-      :hover {
-        transform: scale(1.05);
-        opacity: 0.8;
-        cursor: pointer;
+    > a {
+      > .MuiSvgIcon-root {
+        font-size: 80px;
+        color: lightgray;
+        box-shadow: 5px gray;
+        :hover {
+          transform: scale(1.05);
+          opacity: 0.8;
+          cursor: pointer;
+        }
       }
     }
 
@@ -215,20 +320,26 @@ const FileDownloadContainer = styled.div`
   }
 `;
 
+const RepliesContainer = styled.div`
+
+`;
+
+
 const MessageActionsContainer = styled.div`
   margin-top: 6px;
   display: flex;
   justify-content: space-around;
-  >div{
+  > div {
     display: flex;
     justify-content: center;
-    align-items:center;
+    align-items: center;
     color: var(--ironblue-color);
-    >.MuiSvgIcon-root{
+
+    > .MuiSvgIcon-root {
       color: var(--ironblue-color);
-      :hover{
+      :hover {
         cursor: pointer;
-        transform: scale(1.1)
+        transform: scale(1.1);
       }
     }
   }
@@ -237,6 +348,18 @@ const MessageActionsContainer = styled.div`
 const MessageContainer = styled.div`
   display: flex;
   align-items: center;
+  :hover{
+    background-color: #f5f8f8;
+    border-bottom: 1px solid lightgray;
+  }
+`;
+
+const spinAnimation = keyframes`
+  100% {
+    -webkit-transform: rotate(360deg);
+    transform: rotate(360deg);
+  }
+
 `;
 
 const MessageRightContainer = styled.div``;
@@ -255,7 +378,17 @@ const MessageIconsContainer = styled.div`
     margin-left: 5px;
     :hover {
       cursor: pointer;
-      transform: scale(1.2)
+      transform: scale(1.2);
+    }
+  }
+  .cachedIcon {
+    animation-name: ${spinAnimation};
+    animation-duration: 3s;
+    animation-iteration-count: infinite;
+    :hover {
+      animation-name: ${spinAnimation};
+      animation-duration: 3s;
+      animation-iteration-count: infinite;
     }
   }
 `;

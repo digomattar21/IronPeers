@@ -1,6 +1,6 @@
 import { Button } from "@material-ui/core";
 import React, { useRef, useState } from "react";
-import styled from "styled-components";
+import styled, { keyframes } from "styled-components";
 import { auth, db, storage } from "../../firebase";
 import firebase from "firebase";
 import { useAuthState } from "react-firebase-hooks/auth";
@@ -34,9 +34,8 @@ function ChatInput({ channelName, channelId, chatBottomRef, Private }) {
 
     if (message.length >= 1 && !fileUrl) {
       try {
-        if (Private == true) {
           await db
-            .collection("privaterooms")
+            .collection(Private?'privaterooms':'rooms')
             .doc(channelId)
             .collection("messages")
             .add({
@@ -45,25 +44,9 @@ function ChatInput({ channelName, channelId, chatBottomRef, Private }) {
               user: user?.displayName,
               userImage: user?.photoURL,
               fileDownloadUrl: '',
-              replies:[],
               likes: [],
             });
-        } else {
-          await db
-            .collection("rooms")
-            .doc(channelId)
-            .collection("messages")
-            .add({
-              message: message,
-              timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-              user: user?.displayName,
-              userImage: user?.photoURL,
-              fileDownloadUrl: '',
-              replies:[],
-              likes: [],
-            
-            });
-        }
+        
       } catch (err) {
         console.log(err);
       }
@@ -84,7 +67,6 @@ function ChatInput({ channelName, channelId, chatBottomRef, Private }) {
             user: user?.displayName,
             userImage: user?.photoURL,
             fileDownloadUrl: fileUrl,
-            replies:[],
             likes: [],
           });
         setFileUrl(null);
@@ -96,7 +78,6 @@ function ChatInput({ channelName, channelId, chatBottomRef, Private }) {
           user: user?.displayName,
           userImage: user?.photoURL,
           fileDownloadUrl: fileUrl,
-          replies:[],
           likes:[]
         });
         setFileUrl(null);
@@ -148,16 +129,7 @@ function ChatInput({ channelName, channelId, chatBottomRef, Private }) {
     <ChatInputContainer>
       <form>
         <FormContainer>
-          <EmojiInputContainer
-            onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-          >
-            {!showEmojiPicker && (
-              <Button variant="contained" size="small">
-              <EmojiEmotionsIcon className="emoji-icon" />
-            </Button>
-            )}
-            {showEmojiPicker && <Picker onEmojiClick={handlePickEmoji} />}
-          </EmojiInputContainer>
+          
           <input
             className="textInput"
             onChange={(e) => handleChange(e)}
@@ -172,7 +144,7 @@ function ChatInput({ channelName, channelId, chatBottomRef, Private }) {
           )}
           {loadingState && !hasFile && (
               <>
-                <CachedIcon className='fileIcon' />
+                <CachedIcon className='cachedIcon' />
               </>
           )}
           <ControlsContainer>
@@ -226,10 +198,22 @@ const ControlsContainer = styled.div`
   }
 `;
 
+const spinAnimation = keyframes`
+  100% {
+    -webkit-transform: rotate(360deg);
+    transform: rotate(360deg);
+  }
+
+`;
+
 const EmojiInputContainer = styled.div`
   position: fixed;
   bottom: 40px;
   right: 5%;
+  >button{
+    background-color: var(--ironblue-color);
+    color: white
+  }
 `;
 
 const FormContainer = styled.div`
@@ -250,12 +234,17 @@ const FormContainer = styled.div`
     color: var(--ironblue-color);
     font-size: 32px;
     margin-bottom: 2.5%;
+    
   }
+
 
   .cachedIcon{
     color: var(--ironblue-color);
     font-size: 32px;
     margin-bottom: 2.5%;
+    animation-name: ${spinAnimation};
+    animation-duration: 3s;
+    animation-iteration-count: infinite
   }
 
   .cancelIcon {
