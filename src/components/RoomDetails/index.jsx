@@ -1,5 +1,6 @@
+import { CssBaseline } from "@material-ui/core";
 import React, { useEffect, useState } from "react";
-import { useAuthState } from 'react-firebase-hooks/auth';
+import { useAuthState } from "react-firebase-hooks/auth";
 import styled from "styled-components";
 import { auth, db } from "../../firebase";
 import Api from "../../util/api.util";
@@ -7,74 +8,61 @@ import Message from "../Message";
 
 function RoomDetails({ messageIds, channelId, isPrivate }) {
   const [messagesArray, setMessagesArray] = useState(null);
+  const [pinnedMessages, setPinnedMessages] = useState([]);
+
   const [user] = useAuthState(auth);
 
-  const getPinnedMessages = () => {
+  const getChannelPinnedMessages = async () => {
     try {
-      if (messageIds.length > 0) {
-        let newArray = [];
+      let req = await Api.getPrivateChannelPinnedMessages(channelId);
+      console.log(' req' , req)
+      await getPinnedMessages(req.data.messageFirebaseIds);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
-        if (isPrivate){
-          messageIds.map((id) => {
-            let docRef = db
-              .collection("privaterooms")
-              .doc(channelId)
-              .collection("messages")
-              .doc(id);
-    
-            docRef
-              .get()
-              .then((doc) => {
-                newArray.push(doc.data());
-              })
-              .catch((err) => console.log(err));
-          });
-        }else{
-          console.log('not prive')
-          messageIds.map((id) => {
-            let docRef = db
-              .collection("rooms")
-              .doc(channelId)
-              .collection("messages")
-              .doc(id);
-    
-            docRef
-              .get()
-              .then((doc) => {
-                console.log(doc.data())
-                newArray.push(doc.data());
-              })
-              .catch((err) => console.log(err));
-          });
+  const getPinnedMessages = async (pinnedMessages) => {
+    const newArray = [];
+
+    try {
+      console.log(pinnedMessages)
+      if (pinnedMessages.length > 0) {
+        for (let msg of pinnedMessages) {
+          let ref = db
+            .collection(isPrivate ? "privaterooms" : "rooms")
+            .doc(channelId)
+            .collection("messages")
+            .doc(msg);
+          let temp = await ref.get()
+          newArray.push(temp.data())          
         }
-
         setMessagesArray(newArray);
+        
       }
     } catch (error) {
       console.log(error);
     }
   };
 
-
   useEffect(() => {
-    getPinnedMessages();
+    getChannelPinnedMessages();
   }, []);
-
   return (
     <RoomDetailsContainer>
-      <PinnedMessagesContainer>
-        
-      </PinnedMessagesContainer>
-      <MembersContainer>
-      {messagesArray && messagesArray.length > 0 &&
-          messagesArray.map((message) => {
-            return (
-              <>
-                <h1>{message.message}</h1>
-              </>
-            );
-          })}
-      </MembersContainer>
+      {messagesArray &&
+        messagesArray.length > 0 &&
+        messagesArray.map((message) => {
+          console.log(message);
+          return (
+            <>
+              <h1>{message?.user}</h1>
+            </>
+          );
+        })}
+      {!messagesArray && <h1>Nothing here</h1>}
+      <PinnedMessagesContainer></PinnedMessagesContainer>
+      <MembersContainer></MembersContainer>
     </RoomDetailsContainer>
   );
 }
@@ -97,7 +85,6 @@ const PinnedMessagesContainer = styled.div`
 
 const MembersContainer = styled.div`
   flex: 0.5;
-  border: 1px solid orange;
 `;
 
 const RoomDetailsMembersContainer = styled.div``;

@@ -10,14 +10,11 @@ class Api {
 
     this.api.interceptors.request.use((config) => {
         const token = localStorage.getItem("token");
-        console.log(localStorage.length)
         config.headers ={
           Authorization: `Bearer ${token}`
         };
-        console.log(config.headers)
-        console.log(`API TOKEN: ${token}`)
-      
-      return config;
+        console.log(token)
+        return config;
     });
 
     this.api.interceptors.response.use(
@@ -28,7 +25,9 @@ class Api {
         if (typeof window !== "undefined") {
           localStorage.removeItem("token");
           // auth.signOut()
+          // window.location='/'
           throw JSON.stringify(error.response.data.message);
+          // console.log(error)
         }
       }
     );
@@ -73,9 +72,12 @@ class Api {
   async signUpWithGoogle(payload) {
     try {
       let req = await this.api.post("/auth/signup/google", payload);
+      console.log(req)
+      console.log(req.data.token)
       localStorage.setItem("token", req.data.token);
       return req;
     } catch (error) {
+      console.log('erro', error)
       throw error;
     }
   }

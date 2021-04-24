@@ -19,7 +19,6 @@ function Login() {
         email: signin.user.email,
         profilePic: signin.user.photoURL,
       };
-      console.log(payload);
       let apiReq = await Api.signUpWithGoogle(payload);
       console.log(apiReq);
     } catch (errr) {

@@ -347,7 +347,7 @@ const MessageActionsContainer = styled.div`
 
 const MessageContainer = styled.div`
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   :hover{
     background-color: #f5f8f8;
     border-bottom: 1px solid lightgray;
@@ -368,7 +368,7 @@ const MessageIconsContainer = styled.div`
   display: flex;
   justify-content: flex-start;
   align-items: center;
-  margin-bottom: 10px;
+  margin-top: 17px;
   padding: 8px 6px;
   border: 1px solid var(--ironblue-color);
   border-radius: 9px;

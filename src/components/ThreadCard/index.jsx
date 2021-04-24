@@ -14,7 +14,7 @@ function ThreadCard({ id, title }) {
   const [length, setLength] = useState(0);
   const [iconsShow, setIconsShow] = useState(false);
   const [user] = useAuthState(auth);
-  const [fullStar, setFullStar ] = useState(false)
+  const [fullStar, setFullStar ] = useState(false);
 
   const getChannelMembersLength = async () => {
     try {
