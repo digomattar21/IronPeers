@@ -16,6 +16,7 @@ import Message from "../Message";
 import Api from "../../util/api.util";
 import RoomDetails from "../RoomDetails";
 import StarIcon from '@material-ui/icons/Star';
+import SimplePopover from "../Popover";
 
 
 function Channel() {
@@ -26,6 +27,7 @@ function Channel() {
   const [pinnedMessages, setPinnedMessages] = useState([]);
   const [buttonForExit, setButtonForExit] = useState(false);
   const [fullStar, setFullStar] = useState(false);
+  const [anchorEl, setAnchorEl] = useState(null);
 
   const [roomDetails] = useDocument(
     channelId && db.collection("rooms").doc(channelId)
