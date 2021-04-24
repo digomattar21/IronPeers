@@ -21,11 +21,9 @@ function PrivateChannel() {
   const { channelId } = useParams();
   const [user] = useAuthState(auth);
   const [displayDetails, setDisplayDetails] = useState(false);
-  const [pinnedMessages, setPinnedMessages] = useState([]);
   const [buttonForExit, setButtonForExit] = useState(false);
   const [membersLength, setMembersLength] = useState(0);
   const [open, setOpen] = useState(false);
-  const [showPrivateChannels, setShowPrivateChannels] = useState(true);
   const [updatedSideBar, setUpdatedSideBar] = useState(false);
 
   const [roomDetails] = useDocument(
@@ -41,19 +39,9 @@ function PrivateChannel() {
         .orderBy("timestamp", "asc")
   );
 
-  const handleDetailsClick = async (e) => {
-    try {
-      if (channelId) {
-        let req = await Api.getPrivateChannelPinnedMessages(channelId);
-        let messageIds = req.data.messageFirebaseIds;
-        console.log(messageIds)
-        setPinnedMessages(messageIds);
-        setDisplayDetails(true);
-        setButtonForExit(true);
-      }
-    } catch (error) {
-      console.log(error);
-    }
+  const handleDetailsClick = (e) => {
+    setDisplayDetails(true);
+    setButtonForExit(true);
   };
 
   const getPrivateChannelInfo = async () => {
@@ -83,7 +71,7 @@ function PrivateChannel() {
       behavior: "smooth",
     });
     getPrivateChannelInfo();
-  }, [channelId, loading]);
+  }, [channelId, loading, displayDetails]);
 
   return (
     <ChannelContainer>
@@ -124,8 +112,8 @@ function PrivateChannel() {
               </div>
             </HeaderRight>
           </Header>
-
-          {displayDetails == false && (
+          
+          {!displayDetails && (
             <>
               <ChatMessages>
                 {roomMessages?.docs.map((doc) => {
@@ -149,19 +137,19 @@ function PrivateChannel() {
 
                 <ChatBottom ref={chatBottomRef} />
               </ChatMessages>
-            </>
-          )}
-          {displayDetails && (
-            <RoomDetails messageIds={pinnedMessages} channelId={channelId} isPrivate={true} />
-          )}
-
-          <ChatInput
+            
+            <ChatInput
             Private={true}
             chatBottomRef={chatBottomRef}
             channelId={channelId}
             channelName={roomDetails?.data().name}
           />
         </>
+          )}
+          {displayDetails && (
+            <RoomDetails channelId={channelId} isPrivate={true} />
+          )}
+          </>
       )}
     </ChannelContainer>
   );

@@ -9,7 +9,7 @@ import {
   import React, { useState } from "react";
   import { useAuthState } from "react-firebase-hooks/auth";
   import styled from "styled-components";
-  import { auth, db } from "../../firebase";
+  import { auth } from "../../firebase";
   import Api from "../../util/api.util";
   
   function AddUsersModal({ open, setOpen, setUpdatedSideBar, updatedSideBar, channelId }) {

@@ -92,12 +92,12 @@ function Channel() {
 
             <HeaderRight>
               {buttonForExit == false && (
-                <div onClick={handleDetailsClick}>
+                <div onClick={(e)=>handleDetailsClick(e)}>
                   <InfoOutlinedIcon /> Details
                 </div>
               )}
               {buttonForExit ==true && (
-                <CloseIcon onClick={handleExitDetailsClick}/>
+                <CloseIcon onClick={(e)=>handleExitDetailsClick(e)}/>
               )}
             </HeaderRight>
           </Header>

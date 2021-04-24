@@ -9,7 +9,6 @@ import Loading from "../Loading";
 function BookMarkedList() {
   const [user] = useAuthState(auth);
   const [bookmarks, setBookmarks] = useState(null);
-  const [message, setMessage] = useState(null);
   const [reRender, setReRender] = useState(false);
 
   useEffect(() => {

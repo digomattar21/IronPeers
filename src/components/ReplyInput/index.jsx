@@ -12,7 +12,7 @@ import Picker, {
   SKIN_TONE_LIGHT,
 } from "emoji-picker-react";
 import EmojiPicker from "emoji-picker-react";
-import firebase from 'firebase';
+import firebase from "firebase";
 
 function ReplyInput({ channelId, id, isPrivate, hasReplies }) {
   const [message, setMessage] = useState("");
@@ -65,7 +65,7 @@ function ReplyInput({ channelId, id, isPrivate, hasReplies }) {
 
   const sendReply = (e) => {
     e.preventDefault();
-    setMessage("")
+    setMessage("");
     db.collection(isPrivate ? "privaterooms" : "rooms")
       .doc(channelId)
       .collection("messages")
@@ -79,20 +79,17 @@ function ReplyInput({ channelId, id, isPrivate, hasReplies }) {
         fileDownloadUrl: fileUrl || "",
         likes: [],
       });
-      
   };
 
   return (
     <ReplyInputContainer>
-      <form onSubmit={(e)=>sendReply(e)}>
+      <form onSubmit={(e) => sendReply(e)}>
         <input
           className="textInput"
           onChange={(e) => handleChange(e)}
           value={message}
           placeholder={`Reply`}
-        >
-          
-        </input>
+        ></input>
         <EmojiInputContainer
           onClick={() => setShowEmojiPicker(!showEmojiPicker)}
         >
@@ -120,7 +117,8 @@ function ReplyInput({ channelId, id, isPrivate, hasReplies }) {
           {loadingState && <CachedIcon className="cachedIcon" />}
         </Button>
         <Button type="button">
-          <EmojiEmotionsIcon className="emojiIcon"
+          <EmojiEmotionsIcon
+            className="emojiIcon"
             onClick={() => setShowEmojiPicker(!showEmojiPicker)}
           />
         </Button>
@@ -145,13 +143,16 @@ const spinAnimation = keyframes`
 `;
 
 const ReplyInputContainer = styled.div`
+  margin-top:5px;
   display: flex;
   justify-content: center;
   > form {
-    >input{
-      :focus{
-        outline: none;
-      }
+    > input {
+      border: 1px solid gray;
+      border-radius: 7px;
+      padding: 10px;
+      outline: none;
+      width: 8vw;
     }
     > button {
       margin-left: 5px;
