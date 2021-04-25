@@ -5,7 +5,6 @@ class Api {
   constructor() {
     this.api = axios.create({
        baseURL: 'https://ironpeersapi.herokuapp.com',
-      // baseURL: "http://localhost:3080",
     });
 
     this.api.interceptors.request.use((config) => {
@@ -109,9 +108,9 @@ class Api {
     }
   }
 
-  async getPrivateChannelPinnedMessages(channelId) {
+  async getPrivateChannelPinnedMessages(payload) {
     try {
-      let req = await this.api.get(`/private/channels/private/getpinnedmessages/${channelId}`);
+      let req = await this.api.post(`/private/channels/private/getpinnedmessages`, payload);
       return req;
     } catch (error) {
       throw error;
@@ -320,6 +319,25 @@ class Api {
     try {
       let req = await this.api.post('/private/user/removebookmarkedmessage', payload);
       console.log(req)
+      return req
+    } catch (error) {
+      throw error
+    }
+  }
+
+  async getChannelMembers(payload){
+    try {
+      let req = await this.api.post('/private/channel/getmembers',payload);
+      console.log(req)
+      return req
+    } catch (error) {
+      throw error
+    }
+  }
+
+  async getMemberInfo(payload){
+    try {
+      let req = await this.api.post('/private/channel/getmembersinfo',payload);
       return req
     } catch (error) {
       throw error
