@@ -15,19 +15,16 @@ import { auth, db } from "../../firebase";
 import Message from "../Message";
 import Api from "../../util/api.util";
 import RoomDetails from "../RoomDetails";
-import StarIcon from '@material-ui/icons/Star';
+import StarIcon from "@material-ui/icons/Star";
 import SimplePopover from "../Popover";
-
 
 function Channel() {
   const chatBottomRef = useRef(null);
   const { channelId } = useParams();
   const [user] = useAuthState(auth);
   const [displayDetails, setDisplayDetails] = useState(false);
-  const [pinnedMessages, setPinnedMessages] = useState([]);
   const [buttonForExit, setButtonForExit] = useState(false);
   const [fullStar, setFullStar] = useState(false);
-  const [anchorEl, setAnchorEl] = useState(null);
 
   const [roomDetails] = useDocument(
     channelId && db.collection("rooms").doc(channelId)
@@ -42,31 +39,20 @@ function Channel() {
         .orderBy("timestamp", "asc")
   );
 
-  const handleDetailsClick = async (e) => {
-    try {
-      if (channelId) {
-        setButtonForExit(true);
-        let req = await Api.getPinnedMessages(channelId);
-        let messageIds = req.data.messageFirebaseIds;
-        setPinnedMessages(messageIds);
-        setDisplayDetails(true);
-        
-      }
-    } catch (error) {
-      console.log(error);
-    }
+  const handleDetailsClick = (e) => {
+    setButtonForExit(true);
+    setDisplayDetails(true);
   };
 
-  const handleFavoriteChannelClick = async()=>{
-    const payload = {userEmail: user.email, channelId: channelId};
+  const handleFavoriteChannelClick = async () => {
+    const payload = { userEmail: user.email, channelId: channelId };
     try {
-      setFullStar(true)
-     await Api.setFavoriteChannel(payload)
-
+      setFullStar(true);
+      await Api.setFavoriteChannel(payload);
     } catch (err) {
-      console.log(err)
+      console.log(err);
     }
-  }
+  };
 
   const handleExitDetailsClick = (e) => {
     setButtonForExit(false);
@@ -86,27 +72,37 @@ function Channel() {
           <Header>
             <HeaderLeft>
               <h4>#{roomDetails?.data().name}</h4>
-              {!fullStar && (<StarOutlineIcon onClick={()=>handleFavoriteChannelClick()}/>)}
-              {fullStar && (<StarIcon />)}
+              {!fullStar && (
+                <StarOutlineIcon onClick={() => handleFavoriteChannelClick()} />
+              )}
+              {fullStar && <StarIcon />}
             </HeaderLeft>
 
             <HeaderRight>
               {buttonForExit == false && (
-                <div onClick={(e)=>handleDetailsClick(e)}>
+                <div onClick={(e) => handleDetailsClick(e)}>
                   <InfoOutlinedIcon /> Details
                 </div>
               )}
-              {buttonForExit ==true && (
-                <CloseIcon onClick={(e)=>handleExitDetailsClick(e)}/>
+              {buttonForExit == true && (
+                <CloseIcon onClick={(e) => handleExitDetailsClick(e)} />
               )}
             </HeaderRight>
           </Header>
 
-          {displayDetails==false && (
+          {!displayDetails && (
             <>
               <ChatMessages>
                 {roomMessages?.docs.map((doc) => {
-                  const { message, timestamp, user, userImage, fileDownloadUrl,replies,likes } = doc.data();
+                  const {
+                    message,
+                    timestamp,
+                    user,
+                    userImage,
+                    fileDownloadUrl,
+                    replies,
+                    likes,
+                  } = doc.data();
                   return (
                     <Message
                       key={doc.id}
@@ -126,17 +122,16 @@ function Channel() {
 
                 <ChatBottom ref={chatBottomRef} />
               </ChatMessages>
+              <ChatInput
+                chatBottomRef={chatBottomRef}
+                channelId={channelId}
+                channelName={roomDetails?.data().name}
+              />
             </>
           )}
           {displayDetails && (
-            <RoomDetails messageIds={pinnedMessages} channelId={channelId} isPrivate={false} />
+            <RoomDetails channelId={channelId} isPrivate={false} />
           )}
-
-          <ChatInput
-            chatBottomRef={chatBottomRef}
-            channelId={channelId}
-            channelName={roomDetails?.data().name}
-          />
         </>
       )}
     </ChannelContainer>
@@ -169,7 +164,7 @@ const HeaderLeft = styled.div`
     margin-left: 1px;
     font-size: 20px;
     color: green;
-    :hover{
+    :hover {
       cursor: pointer;
       transform: scale(1.05);
       opacity: 0.8;
