@@ -9,16 +9,17 @@ import Loading from "../Loading";
 function BookMarkedList() {
   const [user] = useAuthState(auth);
   const [bookmarks, setBookmarks] = useState(null);
-  const [message, setMessage] = useState(null);
+  const [reRender, setReRender] = useState(false);
 
   useEffect(() => {
     user && getBookMarks();
-  }, []);
+  }, [reRender]);
 
 
   const getBookMarks = async () => {
     try {
       let req = await Api.getUserBookmarks(user.email);
+      
       setBookmarks(Array.from(req.bookmarks));
     } catch (error) {
       console.log("error catched", error);
@@ -37,6 +38,8 @@ function BookMarkedList() {
             <BookmarkedCard
               key={bookmark.id}
               bookmark={bookmark}
+              reRender={reRender}
+              setReRender={setReRender}
             ></BookmarkedCard>
           );
         })}

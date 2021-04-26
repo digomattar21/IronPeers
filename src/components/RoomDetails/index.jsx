@@ -1,68 +1,198 @@
+import { CssBaseline } from "@material-ui/core";
 import React, { useEffect, useState } from "react";
-import styled from "styled-components";
-import { db } from "../../firebase";
-import Api from '../../util/api.util'
+import { useAuthState } from "react-firebase-hooks/auth";
+import styled, { keyframes } from "styled-components";
+import { auth, db } from "../../firebase";
+import Api from "../../util/api.util";
+import Message from "../Message";
+import NotListedLocationIcon from "@material-ui/icons/NotListedLocation";
+import PinnedMessage from "../PinnedMessage";
+import CachedIcon from "@material-ui/icons/Cached";
+import PeopleAltIcon from "@material-ui/icons/PeopleAlt";
+import MemberCard from "../MemberCard";
 
-function RoomDetails({ messageIds,channelId }) {
+function RoomDetails({ channelId, isPrivate }) {
+  const [messagesArray, setMessagesArray] = useState(null);
+  const [membersArray, setMembersArray] = useState(null);
+  const [user] = useAuthState(auth);
 
-
-  const [messagesArray, setMessagesArray] = useState(null)
-
-
-
-  const getPinnedMessages = () => {
-
+  const getChannelPinnedMessages = async () => {
+    let payload = {isPrivate:isPrivate, channelId: channelId}
     try {
-      if (messageIds.length>0){
-        let newArray=[]
-        
-          messageIds.map((id)=>{
-            let docRef = db.collection("rooms").doc(channelId).collection("messages").doc(id);
-            console.log(docRef)
-            docRef.get()
-            .then((doc)=>{
-              newArray.push(doc._delegate._document.data.partialValue.mapValue.fields)
-            }).catch((err=>console.log(err)))
-          });
-          
-          setMessagesArray(newArray)
-          console.log(messagesArray) 
-      }
+      let req = await Api.getPrivateChannelPinnedMessages(payload);
+      let req2 = await Api.getChannelMembers(payload);
+      await getPinnedMessages(req.data.messageFirebaseIds);
+      console.log('reqqqqq', req)
+      await getMembersInfo(req2.data.members)
+      
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const getMembersInfo = async (members) => {
+    try {
+      let payload = {"members":members}
+      let req = await Api.getMemberInfo(payload)
+      setMembersArray(req.data.info)    
 
     } catch (error) {
       console.log(error)
     }
+  }
 
+  const getPinnedMessages = async (pinnedMessages) => {
+    const newArray = [];
+
+    try {
+      if (pinnedMessages.length > 0) {
+        for (let msg of pinnedMessages) {
+          let ref = db
+            .collection(isPrivate ? "privaterooms" : "rooms")
+            .doc(channelId)
+            .collection("messages")
+            .doc(msg);
+          let temp = await ref.get();
+          newArray.push(temp.data());
+        }
+        setMessagesArray(newArray);
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
 
+
   useEffect(() => {
-    getPinnedMessages();
+    getChannelPinnedMessages();
   }, []);
-
-
-
 
   return (
     <RoomDetailsContainer>
-      <RoomDetailsHeader>
-          
-      </RoomDetailsHeader>
-
-      <RoomDetailsLowerContainer>
-
-      </RoomDetailsLowerContainer>
+      <PinnedMessagesContainer>
+        <PinnedMessagesHeaderContainer>
+          <h2>Pinned Messages </h2>
+          <NotListedLocationIcon />
+        </PinnedMessagesHeaderContainer>
+        <PinnedMessagesList>
+          {messagesArray &&
+            messagesArray.length > 0 &&
+            messagesArray.map((message) => {
+              console.log(message)
+              return (
+                <PinnedMessage
+                  message={message}
+                  isPrivate={isPrivate}
+                  channelId={channelId}
+                />
+              );
+            })}
+          {!messagesArray && <CachedIcon className="cachedIcon" />}
+        </PinnedMessagesList>
+      </PinnedMessagesContainer>
+      <MembersContainer>
+        <MembersHeaderContainer>
+          <h2>Members</h2>
+          <PeopleAltIcon />
+        </MembersHeaderContainer>
+        <MembersList>
+        {membersArray && membersArray.length>0 &&(
+          membersArray.map((member)=>{
+            return(
+              <MemberCard member={member}/>
+            )
+          })
+        )}
+        {!membersArray && <CachedIcon className="cachedIcon" />}
+        </MembersList>
+      </MembersContainer>
     </RoomDetailsContainer>
   );
 }
 
 export default RoomDetails;
 
-const RoomDetailsContainer = styled.div``;
+const RoomDetailsContainer = styled.div`
+  margin-top: 90px;
+  display: flex;
+  justify-content: space-around;
+  width: 100%;
+  height: 100%;
+`;
 
-const RoomDetailsHeader = styled.div``;
+const PinnedMessagesHeaderContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  > h2 {
+    color: var(--ironblue-color);
+    text-decoration: underline;
 
-const RoomDetailsLowerContainer = styled.div``;
+  }
+  > .MuiSvgIcon-root {
+    margin-left: 10px;
+    color: var(--ironblue-color);
+  }
+`;
 
-const RoomDetailsPinnedMessagesContainer = styled.div``;
+const spinAnimation = keyframes`
+  100% {
+    -webkit-transform: rotate(360deg);
+    transform: rotate(360deg);
+  }
 
-const RoomDetailsMembersContainer = styled.div``;
+`;
+
+const PinnedMessagesList = styled.div`
+  margin-top: 30px;
+  height: 80%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  .cachedIcon {
+    color: var(--ironblue-color);
+    font-size: 32px;
+    animation-name: ${spinAnimation};
+    animation-duration: 2s;
+    animation-iteration-count: infinite;
+  }
+`;
+
+const PinnedMessagesContainer = styled.div`
+  flex: 0.5;
+  border-right: 1px solid lightgray;
+`;
+
+const MembersContainer = styled.div`
+  flex: 0.5;
+`;
+
+const MembersHeaderContainer = styled.div`
+  display: flex;
+  align-items: center;
+
+  justify-content: center;
+  > h2 {
+    color: var(--ironblue-color);
+    text-decoration: underline;
+  }
+  > .MuiSvgIcon-root {
+    margin-left: 10px;
+    color: var(--ironblue-color);
+  }
+`;
+
+const MembersList = styled.div`
+  margin-top: 30px;
+  height: 80%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  .cachedIcon {
+    color: var(--ironblue-color);
+    font-size: 32px;
+    animation-name: ${spinAnimation};
+    animation-duration: 2s;
+    animation-iteration-count: infinite;
+  }
+`;

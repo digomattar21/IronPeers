@@ -1,14 +1,19 @@
-import React, { useState } from "react";
+import React, {  useState } from "react";
 import styled from "styled-components";
 import LockIcon from '@material-ui/icons/Lock';
 import axios from "axios";
 import fileDownload from 'js-file-download';
 import InsertDriveFileIcon from "@material-ui/icons/InsertDriveFile";
+import { auth } from "../../firebase";
+import { useAuthState } from "react-firebase-hooks/auth";
+import Api from "../../util/api.util";
+import CancelIcon from '@material-ui/icons/Cancel'
 
 
 
-function BookmarkedCard({ bookmark }) {
-  const [error, setError] = useState(null)
+function BookmarkedCard({ bookmark, reRender, setReRender }) {
+  const [error, setError] = useState(null);
+  const [user] = useAuthState(auth);
 
 
   const checkFileType = (url) => {
@@ -35,12 +40,25 @@ function BookmarkedCard({ bookmark }) {
      }
     }}
 
+    const handleRemoveBookmark = async () => {
+      let payload = {fileURL: bookmark.fileURL, userEmail: user.email, messageFirebaseId: bookmark.messageFirebaseId, bookmarkMongoId: bookmark._id, isPrivate: bookmark.isPrivate};
+      try {
+        let req = await Api.removeBookmarkedMessage(payload);
+        setReRender(!reRender)
+      } catch (error) {
+        console.log(error)
+      } 
+    }
 
 
   return (
     <BookMarkedCardContainer>
       <BookmarkContainer>
         <BookmarkInfo>
+          <RemoveBookmarkContainer>
+          <CancelIcon className='cancelIcon' onClick={()=>handleRemoveBookmark()}/>
+
+          </RemoveBookmarkContainer>
           <div className="channelContainer">
             {bookmark.isPrivate ? (
               <>
@@ -87,6 +105,16 @@ function BookmarkedCard({ bookmark }) {
 }
 
 export default BookmarkedCard;
+
+const RemoveBookmarkContainer = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  height: 10px;
+  >.MuiSvgIcon-root {
+    color: red;
+    margin-left: 25%;
+  }
+`;
 
 const BookMarkedCardContainer = styled.div`
   padding: 25px 50px;
@@ -139,6 +167,13 @@ const BookmarkInfo = styled.div`
       font-size: 15px;
     }
     margin-bottom: 15px;
+  }
+  >div>.cancelIcon{
+    font-size: 15px;
+    :hover{
+      cursor: pointer;
+      transform: scale(1.1)
+    }
   }
 `;
 
