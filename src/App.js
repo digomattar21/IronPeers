@@ -15,6 +15,7 @@ import Channel from "./components/Channel";
 import Threads from "./components/Threads";
 import PrivateChannel from "./components/PrivateChannel";
 import Inbox from "./components/Inbox";
+import Dm from "./components/Dm"
 
 function App() {
   const [user, loading] = useAuthState(auth);
@@ -41,6 +42,7 @@ function App() {
                   component={PrivateChannel}
                 />
                 <Route path="/inbox" component={Inbox} />
+                <Route path="/user/directmessages/:dmId" component={Dm}/>
               </Switch>
             </AppBody>
           </>

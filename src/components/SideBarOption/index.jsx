@@ -8,7 +8,7 @@ import Api from '../../util/api.util'
 import { Redirect } from "react-router";
 import {useRoutes, useRedirect} from 'hookrouter';
 
-function SideBarOption({ Icon, title, addChannel, setAddChannelInputBool, addChannelInputBool, id, history, handleOpen }) {
+function SideBarOption({ Icon, title, addChannel, setAddChannelInputBool, addChannelInputBool, id, history, handleOpen, color }) {
   const dispatch = useDispatch();
 
   const handleAddChannel = async(name) => {
@@ -43,7 +43,7 @@ function SideBarOption({ Icon, title, addChannel, setAddChannelInputBool, addCha
     >
       {!addChannelInputBool && (
         <>
-          {Icon && <Icon fontSize="small" style={{ padding: 7 }} />}
+          {Icon && <Icon fontSize="small" style={{ padding: 7, color: color?color:'black' }} />}
           {Icon ? (
             <h3>{title}</h3>
           ) : (
@@ -72,8 +72,7 @@ const SideBarOptionContainer = styled.div`
   cursor: pointer;
 
   :hover {
-    opacity: 0.8;
-    background-color: white;
+    opacity: 0.6;
   }
 
   > h3 {
