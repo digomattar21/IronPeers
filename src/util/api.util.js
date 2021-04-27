@@ -4,7 +4,8 @@ import { auth } from "../firebase";
 class Api {
   constructor() {
     this.api = axios.create({
-       baseURL: 'https://ironpeersapi.herokuapp.com',
+      //  baseURL: 'https://ironpeersapi.herokuapp.com',
+      baseURL: "http://localhost:3080"
     });
 
     this.api.interceptors.request.use((config) => {
@@ -338,6 +339,24 @@ class Api {
   async getMemberInfo(payload){
     try {
       let req = await this.api.post('/private/channel/getmembersinfo',payload);
+      return req
+    } catch (error) {
+      throw error
+    }
+  }
+
+  async searchForUser(payload){
+    try {
+      let req = await this.api.post('/private/directmessage/searchforuser',payload);
+      return req
+    } catch (error) {
+      throw error
+    }
+  }
+
+  async addNewDm(payload){
+    try {
+      let req = await this.api.post('/private/directmessage/createnew', payload);
       return req
     } catch (error) {
       throw error

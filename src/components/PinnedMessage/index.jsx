@@ -73,7 +73,13 @@ export default PinnedMessage;
 
 const MessageContainer = styled.div`
   display: flex;
+  background-color:white;
+  margin-top:8px;
+  padding: 7px 15px;
   align-items: flex-start;
+  border: 1px solid lightgray;
+    border-radius: 5px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
 `;
 
 const FileDownloadContainer = styled.div`

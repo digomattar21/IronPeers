@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
-import { Avatar } from "@material-ui/core";
+import { Avatar, Button } from "@material-ui/core";
 import SendIcon from "@material-ui/icons/Send";
 import AccessTimeIcon from "@material-ui/icons/AccessTime";
 import SearchIcon from "@material-ui/icons/Search";
@@ -10,20 +10,38 @@ import { useAuthState } from "react-firebase-hooks/auth";
 import ArrowBackIcon from "@material-ui/icons/ArrowBack";
 import ArrowForwardIcon from "@material-ui/icons/ArrowForward";
 import { useHistory } from "react-router";
-
+import Popper from "@material-ui/core/Popper";
+import SettingsModal from '../SettingsModal';
 
 function Header() {
   const [user] = useAuthState(auth);
-  const history = useHistory()
+  const history = useHistory();
+  const [openModal, setOpenModal] = useState(false);
+  const [anchorEl, setAnchorEl] = useState(null);
+
+  const handleEnter = (event) => {
+    setAnchorEl(anchorEl ? null : event.currentTarget);
+  };
+
+  const handleLeave = (event) => {
+    setAnchorEl(null)
+  }
+
+  const handleOpen = () =>{
+    setOpenModal(true)
+  }
+
+  const open = Boolean(anchorEl);
+  const id = open ? "simple-popper" : undefined;
 
   return (
     <HeaderContainer>
       <HeaderLeft>
         <HeaderAvatar alt={user?.displayName} src={user?.photoURL} />
-        
+
         <div className="arrowsContainer">
-          <ArrowBackIcon onClick={()=>history.goBack()}/>
-          <ArrowForwardIcon onClick={()=>history.goForward()}/>
+          <ArrowBackIcon onClick={() => history.goBack()} />
+          <ArrowForwardIcon onClick={() => history.goForward()} />
         </div>
 
         <AccessTimeIcon />
@@ -35,7 +53,17 @@ function Header() {
       </HeaderSearch>
 
       <HeaderRight>
-        <HelpOutlineIcon />
+        <Button className='settingsPopperBtn' aria-describedby={id} type="button" onMouseEnter={handleEnter} onMouseLeave={handleLeave} onClick={handleOpen}>
+          <HelpOutlineIcon />
+        </Button>
+        <Popper id={id} open={open} anchorEl={anchorEl} className='popper'>
+          <div style={{backgroundColor: '#282828', color:'white', padding: '10px 15px', borderRadius:'5px' }}>Settings</div>
+        </Popper>
+        <SettingsModal 
+          open={openModal}
+          setOpen={setOpenModal}
+
+        />
       </HeaderRight>
     </HeaderContainer>
   );
@@ -64,15 +92,15 @@ const HeaderLeft = styled.div`
     margin-left: auto;
     margin-right: 30px;
   }
-  .arrowsContainer{
-      margin-left: 45%;
-      >.MuiSvgIcon-root{
-        margin-left: 7px;
-        :hover{
-          cursor:pointer;
-          transform: scale(1.2)
-        }
+  .arrowsContainer {
+    margin-left: 45%;
+    > .MuiSvgIcon-root {
+      margin-left: 7px;
+      :hover {
+        cursor: pointer;
+        transform: scale(1.2);
       }
+    }
   }
 `;
 
@@ -111,8 +139,19 @@ const HeaderRight = styled.div`
   flex: 0.3;
   display: flex;
   align-items: flex-end;
-  > .MuiSvgIcon-root {
+  .settingsPopperBtn{
+    :hover{
+      opacity: 0.8;
+      cursor: pointer;
+    }
+  }
+  > * > .MuiSvgIcon-root {
     margin-left: auto;
     margin-right: 20px;
   }
+  .popper{
+    background-color:black;
+  }
+    
+  
 `;

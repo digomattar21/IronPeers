@@ -19,6 +19,8 @@ import { useAuthState } from "react-firebase-hooks/auth";
 import { Link } from "@material-ui/core";
 import Api from "../../util/api.util";
 import CreateChannelModal from "../CreateChannelModal";
+import DmModal from "../DmModal";
+import SendIcon from "@material-ui/icons/Send";
 
 function SideBar(props) {
   const [addChannelInputBool, setAddChannelInputBool] = useState(false);
@@ -28,12 +30,16 @@ function SideBar(props) {
   const [joinedChannels, setJoinedChannels] = useState([]);
   const [favoriteChannels, setFavoriteChannels] = useState([]);
   const [privateChannels, setPrivateChannels] = useState([]);
-  const [showChannels, setShowChannels] = useState(true);
+  const [showChannels, setShowChannels] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const [open, setOpen] = useState(false);
+  const [open2, setOpen2] = useState(false);
   const [showPrivateChannels, setShowPrivateChannels] = useState(true);
   const [updatedSideBar, setUpdatedSideBar] = useState(false);
-  const [hasUnread, setHasUnread] = useState(null)
+  const [hasUnread, setHasUnread] = useState(null);
+  const [userDmsIds, setUserDmsIds] = useState(null);
+  const [showDms, setShowDms] = useState(false);
+  const [dms, setDms] = useState(null);
 
   const handleChange = (e) => {
     if (e.target) {
@@ -45,6 +51,13 @@ function SideBar(props) {
     setOpen(true);
   };
 
+  const handleOpen2 = () => {
+    setOpen2(true);
+  };
+
+  const handleShowDmsClick = () => {
+    setShowDms(!showDms);
+  };
 
   const getUserChannels = async () => {
     let payload = { userEmail: user.email };
@@ -53,11 +66,28 @@ function SideBar(props) {
       setJoinedChannels(req.data.joinedChannels);
       setFavoriteChannels(req.data.favoriteChannels);
       setPrivateChannels(req.data.privateChannels);
-      setHasUnread(req.data.hasUnread)
+      setHasUnread(req.data.hasUnread);
+      setUserDmsIds(req.data.userDms);
+      getUserDms(req.data.userDms)
     } catch (error) {
       console.log(error);
     }
   };
+
+  const getUserDms =  (dmsIds) => {
+    let temp = [];
+    if (!dmsIds || dmsIds.length<=0){
+      return
+    }
+    dmsIds.map((id)=>{
+      let ref = db.collection("dms").doc(id);
+      ref.get().then((res)=>{
+        let temp2 = {name: res.data().name, id: res.id}
+        temp.push(temp2)
+      })
+    })
+    setDms(temp);
+  }
 
   const handleShowChannelsClick = () => {
     setShowChannels(!showChannels);
@@ -82,7 +112,13 @@ function SideBar(props) {
             {message && <h5>{message}</h5>}
           </h3>
         </SideBarInfo>
-        <CreateIcon />
+        <CreateIcon onClick={handleOpen2} />
+        <DmModal
+          setOpen={setOpen2}
+          open={open2}
+          updatedSideBar={updatedSideBar}
+          setUpdatedSideBar={setUpdatedSideBar}
+        />
       </SideBarHeader>
 
       <Link href="/" style={{ textDecoration: "none", color: "black" }}>
@@ -91,7 +127,9 @@ function SideBar(props) {
       <Link href="/inbox" style={{ textDecoration: "none", color: "black" }}>
         <InboxContainer>
           <SideBarOption Icon={InboxIcon} title="Inbox" />
-          {hasUnread==true && <FiberManualRecordIcon className="record-icon"/>}
+          {hasUnread == true && (
+            <FiberManualRecordIcon className="record-icon" />
+          )}
         </InboxContainer>
       </Link>
       <SideBarOption Icon={DraftsIcon} title="Saved" />
@@ -118,7 +156,11 @@ function SideBar(props) {
       </ModalContainer>
       <hr />
 
-      <SideBarOption Icon={StarBorderIcon} title="Favorite Channels" />
+      <SideBarOption
+        Icon={StarBorderIcon}
+        color="white"
+        title="Favorite Channels"
+      />
 
       {favoriteChannels.length > 0 &&
         favoriteChannels.map((channel) => {
@@ -135,13 +177,21 @@ function SideBar(props) {
 
       {showChannels && (
         <div onClick={() => handleShowChannelsClick()}>
-          <SideBarOption Icon={ExpandLessIcon} title="Joined Channels" />
+          <SideBarOption
+            Icon={ExpandLessIcon}
+            color="white"
+            title="Joined Channels"
+          />
         </div>
       )}
 
       {!showChannels && (
         <div onClick={() => handleShowChannelsClick()}>
-          <SideBarOption Icon={ExpandMoreIcon} title="Joined Channels" />
+          <SideBarOption
+            Icon={ExpandMoreIcon}
+            color="white"
+            title="Joined Channels"
+          />
         </div>
       )}
 
@@ -159,25 +209,35 @@ function SideBar(props) {
           );
         })}
 
-      {showPrivateChannels == true && (
+      {showPrivateChannels && (
         <div onClick={() => handleShowPrivateChannelsClick()}>
-          <SideBarOption Icon={ExpandLessIcon} title="Private Channels" />
+          <SideBarOption
+            Icon={ExpandLessIcon}
+            color="white"
+            title="Private Channels"
+          />
         </div>
       )}
 
-      {showPrivateChannels == false && (
+      {!showPrivateChannels && (
         <div onClick={() => handleShowPrivateChannelsClick()}>
-          <SideBarOption Icon={ExpandMoreIcon} title="Private Channels" />
+          <SideBarOption
+            Icon={ExpandMoreIcon}
+            color="white"
+            title="Private Channels"
+          />
         </div>
       )}
 
-      {privateChannels.length > 0 &&
+      {privateChannels && 
+        privateChannels.length > 0 &&
         showPrivateChannels == true &&
         privateChannels.map((channel) => {
           return (
             <Link href={`/channel/private/${channel.firebaseId}`}>
               <SideBarOption
                 Icon={LockIcon}
+                color="green"
                 key={channel.firebaseId}
                 id={channel.firebaseId}
                 title={channel.name}
@@ -185,6 +245,41 @@ function SideBar(props) {
             </Link>
           );
         })}
+
+      {showDms && (
+        <div onClick={() => handleShowDmsClick()}>
+          <SideBarOption
+            Icon={ExpandLessIcon}
+            color="white"
+            title="Direct Messages"
+          />
+        </div>
+      )}
+
+      {!showDms && (
+        <div onClick={() => handleShowDmsClick()}>
+          <SideBarOption
+            Icon={ExpandMoreIcon}
+            color="white"
+            title="Direct Messages"
+          />
+        </div>
+      )}
+
+      {showDms && dms && dms.length>0 && (
+        dms.map((dm) =>{
+          return(
+            <Link href ={`/user/directmessages/${dm.id}`}>
+              <SideBarOption
+              Icon={SendIcon}
+              color='purple'
+              key={dm.id}
+              id={dm.id}
+              title={dm.name} />
+            </Link>
+          )
+        })
+      )}
     </SideBarContainer>
   );
 }
@@ -194,16 +289,15 @@ export default SideBar;
 const InboxContainer = styled.div`
   display: flex;
   align-items: center;
-  >.MuiSvgIcon-root {
+  > .MuiSvgIcon-root {
     color: red;
     font-size: 8px;
     margin-left: 2px;
-    padding-bottom:4px;
+    padding-bottom: 4px;
   }
-  :hover{
+  :hover {
     background-color: white;
   }
-
 `;
 
 const SideBarContainer = styled.div`
