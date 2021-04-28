@@ -28,20 +28,20 @@ function DmModal({ open, setOpen, updatedSideBar, setUpdatedSideBar }) {
       setMessage("");
       var dm = await db.collection("dms").add({
         name: `${user.displayName} & ${selectedUser}`,
-        
+        userOneUsername: user.displayName, 
+        userTwoUsername: selectedUser[0],
+        userOneProfilePic: user.photoURL
       });
 
       let payload = {
         userWhoInvitedEmail: user.email, 
-        userReceivingUsername: selectedUser,
+        userReceivingUsername: selectedUser[0],
         dmId : dm.id,
         dmName: `${user.displayName} & ${selectedUser}`
       };
 
       console.log(dm.id);
-
-      let req = await Api.addNewDm(payload)
-      console.log(req)
+      let req = await Api.sendDmRequest(payload);
 
       setUpdatedSideBar(!updatedSideBar)
       setOpen(false);

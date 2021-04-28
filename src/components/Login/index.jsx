@@ -27,6 +27,7 @@ function Login() {
   };
 
   const handleLoginSubmit = async (e)=>{
+      e.preventDefault();
     try {
       await auth.signInWithEmailAndPassword(email,password);
       let payload ={email:email}

@@ -116,6 +116,7 @@ function Channel() {
                       fileDownloadUrl={fileDownloadUrl}
                       replies={replies}
                       likes={likes}
+                      Private={false}
                     />
                   );
                 })}
@@ -126,6 +127,7 @@ function Channel() {
                 chatBottomRef={chatBottomRef}
                 channelId={channelId}
                 channelName={roomDetails?.data().name}
+                Private={false}
               />
             </>
           )}

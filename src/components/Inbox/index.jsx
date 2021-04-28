@@ -52,15 +52,13 @@ function Inbox() {
               console.log(invite._id);
               return (
                 <>
-                  <div>
-                    <h4>Channel Invites</h4>
-                  </div>
                   <InviteCard
                     key={invite._id}
                     id={invite._id}
                     userWhoInvited={invite.userWhoInvited}
                     read={invite.read}
-                    channelFirebaseId={invite.channelFirebaseId}
+                    channelFirebaseId={invite.channelFirebaseId?invite.channelFirebaseId:null}
+                    dmId={invite.dmId?invite.dmId:null}
                     timestamp={invite.createdAt}
                     reRender={reRender}
                     setReRender={setReRender}
