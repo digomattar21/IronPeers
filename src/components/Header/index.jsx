@@ -12,6 +12,7 @@ import ArrowForwardIcon from "@material-ui/icons/ArrowForward";
 import { useHistory } from "react-router";
 import Popper from "@material-ui/core/Popper";
 import SettingsModal from '../SettingsModal';
+import MeetingRoomIcon from '@material-ui/icons/MeetingRoom';
 
 function Header() {
   const [user] = useAuthState(auth);
@@ -64,6 +65,7 @@ function Header() {
           setOpen={setOpenModal}
 
         />
+        <MeetingRoomIcon className='signOutIcon' onClick={()=>auth.signOut()}/>
       </HeaderRight>
     </HeaderContainer>
   );
@@ -138,7 +140,13 @@ const HeaderSearch = styled.div`
 const HeaderRight = styled.div`
   flex: 0.3;
   display: flex;
-  align-items: flex-end;
+  align-items: center;
+  .signOutIcon{
+    :hover{
+      cursor: pointer;
+      opacity: 0.6;
+    }
+  }
   .settingsPopperBtn{
     :hover{
       opacity: 0.8;

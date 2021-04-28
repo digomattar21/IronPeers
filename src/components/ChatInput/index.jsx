@@ -1,5 +1,5 @@
 import { Button } from "@material-ui/core";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import styled, { keyframes } from "styled-components";
 import { auth, db, storage } from "../../firebase";
 import firebase from "firebase";
@@ -16,7 +16,7 @@ import Picker, {
 } from "emoji-picker-react";
 import EmojiPicker from "emoji-picker-react";
 
-function ChatInput({ channelName, channelId, chatBottomRef, Private }) {
+function ChatInput({ channelName, channelId, chatBottomRef, Private, dmId }) {
   const [message, setMessage] = useState("");
   const [fileUrl, setFileUrl] = useState(null);
   const [user] = useAuthState(auth);
@@ -26,14 +26,16 @@ function ChatInput({ channelName, channelId, chatBottomRef, Private }) {
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [loadingState, setLoadingState] = useState(false);
 
+
   const sendMessage = async (e) => {
     e.preventDefault();
-    if (!channelId) {
+    if (!channelId && !dmId) {
       return false;
     }
-
+    try {
     if (message.length >= 1 && !fileUrl) {
-      try {
+      
+        if (Private===true || Private===false){
           await db
             .collection(Private?'privaterooms':'rooms')
             .doc(channelId)
@@ -46,16 +48,29 @@ function ChatInput({ channelName, channelId, chatBottomRef, Private }) {
               fileDownloadUrl: '',
               likes: [],
             });
+        }else{
+          await db
+            .collection("dms")
+            .doc(dmId)
+            .collection("messages")
+            .add({
+              message: message,
+              timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+              user: user?.displayName,
+              userImage: user?.photoURL,
+              fileDownloadUrl: '',
+              likes: [],
+            });
+        }
         
-      } catch (err) {
-        console.log(err);
-      }
+      
       chatBottomRef?.current.scrollIntoView({
         behavior: "smooth",
       });
 
       setMessage("");
-    } else if (fileUrl) {
+      }
+     else if (fileUrl) {
       if (Private == true) {
         await db
           .collection("privaterooms")
@@ -71,7 +86,7 @@ function ChatInput({ channelName, channelId, chatBottomRef, Private }) {
           });
         setFileUrl(null);
         setHasFile(false);
-      } else {
+      } else if (Private==false) {
         await db.collection("rooms").doc(channelId).collection("messages").add({
           message: message,
           timestamp: firebase.firestore.FieldValue.serverTimestamp(),
@@ -83,7 +98,24 @@ function ChatInput({ channelName, channelId, chatBottomRef, Private }) {
         setFileUrl(null);
         setHasFile(false);
       }
+        else{
+          await db.collection("dms").doc(dmId).collection("messages").add({
+            message: message,
+            timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+            user: user?.displayName,
+            userImage: user?.photoURL,
+            fileDownloadUrl: fileUrl,
+            likes: []
+          })
+          setFileUrl(null);
+          setHasFile(false);
+        }
+        
+      }
+    } catch (err) {
+      console.log(err);
     }
+    
   };
 
   const onFileChange = async (e) => {

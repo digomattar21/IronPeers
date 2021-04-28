@@ -15,13 +15,15 @@ import Api from "../../util/api.util.js";
 import { Link, Redirect } from "react-router-dom";
 import Loading from "../Loading/index.jsx";
 import { useAuthState } from "react-firebase-hooks/auth";
-import { auth } from "../../firebase.js";
+import { auth, db } from "../../firebase.js";
+import SendIcon from "@material-ui/icons/Send";
 
 function InviteCard({
   userWhoInvited,
   read,
   channelFirebaseId,
   id,
+  dmId,
   reRender,
   setReRender,
 }) {
@@ -34,12 +36,14 @@ function InviteCard({
     let payload = {
       userWhoInvited: userWhoInvited,
       channelFirebaseId: channelFirebaseId,
+      dmId: dmId,
     };
     try {
       let req = await Api.getInviteInfo(payload);
-      setMembersLength(req.data.membersLength);
       setUserWhoInvitedName(req.data.userName);
-      setChannelName(req.data.channelName);
+      if (!dmId){
+        setMembersLength(req.data.membersLength);
+        setChannelName(req.data.channelName);}
     } catch (error) {
       console.log(error);
     }
@@ -56,7 +60,6 @@ function InviteCard({
   };
 
   const handleRedirect = async () => {
-    console.log(id);
     let payload = {
       userEmail: user.email,
       channelFirebaseId: channelFirebaseId,
@@ -70,13 +73,34 @@ function InviteCard({
     }
   };
 
+  const handleDmRedirect = async ()=>{
+    const payload = {
+      inviteId: id,
+      userEmail: user.email,
+      otherUsername: userWhoInvitedName,
+      dmId: dmId
+    }
+    try {
+      let req = await Api.addNewDm(payload);
+      console.log(req)
+      db.collection("dms").doc(dmId).set({
+        userTwoProfilePic: user.photoURL},
+        {merge: true}
+      )
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
   useEffect(() => {
     getInviteInfo();
   }, []);
 
   return (
     <CardContainer>
-      {(!channelName || !membersLength || !userWhoInvitedName) && <Loading />}
+      {!channelName && !membersLength && !userWhoInvitedName && !dmId && (
+        <Loading />
+      )}
       {channelName && membersLength && userWhoInvitedName && (
         <Card className="card">
           <CardContent className="card-content">
@@ -122,11 +146,60 @@ function InviteCard({
           </CardActions>
         </Card>
       )}
+      {!channelName && dmId && (
+        <Card className="card">
+          <CardContent className="card-content">
+            <div className="first-text-container">
+              <Typography style={{ fontSize: "12px" }} gutterBottom>
+                {userWhoInvitedName && (
+                  <DmInfoContainer>
+                  <span style={{fontWeight: "bold"}}>
+                    {userWhoInvitedName} <span style={{fontWeight: "400"}}>is requesting to send you a DM</span>
+                  </span>
+                    <SendIcon />
+                  </DmInfoContainer>
+                )}
+              </Typography>
+            </div>
+          </CardContent>
+
+          <CardActions className="card-actions">
+            <Link to={`/user/directmessages/${dmId}`} className="link" style={{textDecoration: "none", color: "white" }}>
+              <Button
+                className="joinBtn"
+                size="small"
+                variant="contained"
+                endIcon={<ExitToAppIcon style={{ color: "white" }} />}
+                onClick={() => handleDmRedirect()}
+              >Accept</Button>
+            </Link>
+            <Link className="link" style={{textDecoration: "none", color: "white" }}>
+              <Button
+                size="small"
+                className="deleteBtn"
+                variant="contained"
+                endIcon={<HighlightOffIcon style={{ color: "white" }} />}
+                onClick={() => handleDelete()}
+              >Deny</Button>
+            </Link>
+          </CardActions>
+        </Card>
+      )}
     </CardContainer>
   );
 }
 
 export default InviteCard;
+
+const DmInfoContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  >.MuiSvgIcon-root {
+    margin-left: 8px;
+    color: var(--ironblue-color)
+  }
+
+`;
 
 const CardContainer = styled.div`
   margin-top: 30px;
@@ -152,6 +225,9 @@ const CardContainer = styled.div`
         display: flex;
         justify-content: space-between;
         align-items: center;
+        > span {
+          font-weight: bold;
+        }
         > .MuiSvgIcon-root {
           color: red;
           font-size: 8px;
