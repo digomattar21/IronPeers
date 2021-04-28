@@ -1,10 +1,11 @@
-import { Backdrop, Button, Fade, Modal, TextField } from "@material-ui/core";
+import { Backdrop, Button, Fade, Modal, Switch, TextField } from "@material-ui/core";
 import React, { useState } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import styled from "styled-components";
 import { auth } from "../../firebase";
 import Api from "../../util/api.util";
 import SendIcon from "@material-ui/icons/Send";
+import SettingsIcon from "@material-ui/icons/Settings";
 
 function SettingsModal({ open, setOpen }) {
   const [user] = useAuthState(auth);
@@ -16,32 +17,21 @@ function SettingsModal({ open, setOpen }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const reg = /^[a-z0-9_-]{3,15}$/;
-    try {
-      if (reg.test(username)) {
-        let payload = {
-          userWhoInvited: user.email,
-          userInvited: username,
-        };
-        console.log(user.displayName, username);
-
-        let req = await Api.sendPrivateChannelInvite(payload);
-        setMessage(req.data.message);
-
-        setOpen(false);
-      } else {
-        setMessage("Invalid email, please use only letters, no spaces");
-      }
-    } catch (error) {
-      console.log(error);
-      setMessage(error);
-    }
   };
 
   const handleClose = () => {
     setOpen(false);
     setMessage(null);
   };
+
+  const handleResetEmailClick = () =>{
+   
+  }
+
+  const handleResetPasswordClick = () =>{
+    auth.sendPasswordResetEmail()
+  }
+
   return (
     <Modal
       aria-labelledby="transition-modal-title"
@@ -66,38 +56,74 @@ function SettingsModal({ open, setOpen }) {
             <form onSubmit={(e) => handleSubmit(e)}>
               <div>
                 <h3 style={{ textAlign: "center", marginBottom: "25px" }}>
-                  New Direct Message
+                  My Settings
                 </h3>
-                <SendIcon />
+                <SettingsIcon />
               </div>
 
-              <TextField
-                id="input"
-                label="Search by Username"
-                variant="outlined"
-                name="username"
-                onChange={(e) => handleChange(e)}
-                className="input"
-                value={username}
-              />
+              <InfoContainer>
+                <div className="emailContainer">
+                  <h3>Username:</h3>
+                  <h4>{user.displayName}</h4>
+                </div>
+                <div className="emailContainer">
+                  <h3>Email:</h3>
+                  <h4>{user.email}</h4>
+                </div>
+                <div className="emailContainer">
+                  <h3>Email Verified: </h3>
+                  <Switch
+                    checked={auth.currentUser.emailVerified}
+                    readonly
+                    name="checkedA"
+                    inputProps={{ "aria-label": "secondary checkbox" }}
+                  />
+                </div>
+                {!auth.currentUser.emailVerified && (
+                  {/* <>
+                  <div className="emailContainer">
+                    <h3>Password: </h3>
+                    <h4>*********</h4>
+                  </div>
+                  <div className="emailContainer">
+                    <h3>Actions</h3>
+                    <section style={{display:'flex', justifyContent:'space-around', marginTop: '10px'}}>
+                    <Button
+                      type="button"
+                      style={{
+                        backgroundColor: "red",
+                        color: "white",
+                        marginTop: "4px",
+                        marginRight: '5px'
+                      }}
+                      onClick={()=>handleResetPasswordClick()}
+                    >
+                      Reset Password
+                    </Button>
+                    <Button
+                      type="button"
+                      style={{
+                        backgroundColor: "red",
+                        color: "white",
+                        marginTop: "4px",
+                        marginLeft: '5px'
+                      }}
+                      onClick={()=>handleResetEmailClick()}
+                    >
+                      Reset Email
+                    </Button>
 
-              <TextField
-                id="input"
-                label="Search by Email"
-                variant="outlined"
-                name="email"
-                onChange={(e) => handleChange(e)}
-                className="input"
-                value={email}
-              />
+
+                    </section>
+                  </div>
+                  
+                  </> */}
+                )}
+              </InfoContainer>
 
               {message && (
                 <h6 style={{ color: "red", textAlign: "center" }}>{message}</h6>
               )}
-
-              <Button type="submit" variant="contained">
-                Submit
-              </Button>
             </form>
           </LoginFormContainer>
         </Paper>
@@ -107,6 +133,24 @@ function SettingsModal({ open, setOpen }) {
 }
 
 export default SettingsModal;
+
+const InfoContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  .emailContainer {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    > h4 {
+      color: var(--ironblue-color);
+    }
+    > h3 {
+      color: gray;
+    }
+  }
+`;
 
 const Paper = styled.div`
   background-color: #f8f8f8;

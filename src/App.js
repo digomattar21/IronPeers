@@ -16,6 +16,8 @@ import Threads from "./components/Threads";
 import PrivateChannel from "./components/PrivateChannel";
 import Inbox from "./components/Inbox";
 import Dm from "./components/Dm"
+import UserProfile from './components/UserProfile';
+import UserSettings from './components/UserSettings';
 
 function App() {
   const [user, loading] = useAuthState(auth);
@@ -43,6 +45,8 @@ function App() {
                 />
                 <Route path="/inbox" component={Inbox} />
                 <Route path="/user/directmessages/:dmId" component={Dm}/>
+                <Route path="/user/profile" component={UserProfile}/>
+                <Route path="/user/settings" component={UserSettings}/>
               </Switch>
             </AppBody>
           </>
