@@ -4,8 +4,7 @@ import { auth } from "../firebase";
 class Api {
   constructor() {
     this.api = axios.create({
-      //  baseURL: 'https://ironpeersapi.herokuapp.com',
-      baseURL: "http://localhost:3080"
+       baseURL: 'https://ironpeersapi.herokuapp.com',
     });
 
     this.api.interceptors.request.use((config) => {
@@ -372,6 +371,14 @@ class Api {
     }
   }
 
+  async checkDelete(payload) {
+    try {
+      let req = await this.api.post('/private/channel/checkdeletemessage', payload)
+      return req
+    } catch (error) {
+      throw error
+    }
+  }
 
 }
 
