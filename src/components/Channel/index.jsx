@@ -132,7 +132,9 @@ function Channel() {
             </>
           )}
           {displayDetails && (
+            <div style={{marginTop: '80px'}}>
             <RoomDetails channelId={channelId} isPrivate={false} />
+            </div>
           )}
         </>
       )}

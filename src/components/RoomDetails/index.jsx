@@ -22,7 +22,7 @@ function RoomDetails({ channelId, isPrivate }) {
       let req = await Api.getPrivateChannelPinnedMessages(payload);
       let req2 = await Api.getChannelMembers(payload);
       await getPinnedMessages(req.data.messageFirebaseIds);
-      console.log('reqqqqq', req)
+      console.log('reqqqqq', req2)
       await getMembersInfo(req2.data.members)
       
     } catch (error) {
@@ -32,7 +32,7 @@ function RoomDetails({ channelId, isPrivate }) {
 
   const getMembersInfo = async (members) => {
     try {
-      let payload = {"members":members}
+      let payload = {members:members}
       let req = await Api.getMemberInfo(payload)
       setMembersArray(req.data.info)    
 

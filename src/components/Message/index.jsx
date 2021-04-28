@@ -163,7 +163,7 @@ function Message({
     }
   };
 
-  const handleDeleteClick = (e) => {
+  const handleDeleteClick = async (e) => {
     console.log(user, userState.displayName);
     if (user === userState.displayName) {
       if (Private == true || Private == false) {
@@ -172,6 +172,13 @@ function Message({
           .collection("messages")
           .doc(id)
           .delete();
+          try{
+            let checkIfPinned = await Api.checkDelete({channeFirebaseId: channelId, Private: Private, messageFirebaseId: id});
+            console.log(checkIfPinned)
+          }catch(err){
+            console.log(err)
+          }
+          
       } else {
         db.collection("dms").doc(dmId).collection("messages").doc(id).delete();
       }
