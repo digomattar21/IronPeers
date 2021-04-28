@@ -127,7 +127,7 @@ function DmModal({ open, setOpen, updatedSideBar, setUpdatedSideBar }) {
 
               <TextField
                 id="input"
-                label="Search user ..."
+                label="Search for username"
                 variant="outlined"
                 name="query"
                 onChange={(e) => handleChange(e)}

@@ -98,9 +98,9 @@ function RoomDetails({ channelId, isPrivate }) {
         <MembersList>
         {membersArray && membersArray.length>0 &&(
           membersArray.map((member)=>{
-            let {username, profilePic} = member;
+            let {username, profilePic, email} = member;
             return(
-              <MemberCard username={username} profilePic={profilePic}/>
+              <MemberCard username={username} profilePic={profilePic} email={email}/>
             )
           })
         )}

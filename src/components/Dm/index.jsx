@@ -20,7 +20,8 @@ const Dm = () =>{
   const [buttonForExit, setButtonForExit] = useState(false);
   const [displayDetails, setDisplayDetails] = useState(false);
   const [dmName, setDmName] = useState(null);
-  const [profilePic, setProfilePic] = useState(null)
+  const [profilePic, setProfilePic] = useState(null);
+  const history = useHistory()
   
   const [dmDetails] = useDocument(
     dmId && db.collection("dms").doc(dmId)
@@ -34,7 +35,6 @@ const Dm = () =>{
         .collection("messages")
         .orderBy("timestamp", "asc")
   );
-  console.log(dmMessages)
   
   const handleDetailsClick = (e) => {
     setDisplayDetails(true);
@@ -65,6 +65,19 @@ const Dm = () =>{
     }
   }
 
+  const handleMemberClick = async () =>{
+    if (!dmName) return;
+    try {
+      let req = await Api.getUserEmail({username: dmName});
+      history.push({
+        pathname: "/user/profile",
+        search: req.data.email
+      })
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
 
   return(
     <ChannelContainer>
@@ -72,7 +85,7 @@ const Dm = () =>{
         <>
           <Header>
             <HeaderLeft>
-              <div className="first-container">
+              <div className="first-container" onClick={()=>handleMemberClick()}>
                 <img src={profilePic && profilePic} width='32' height='32' style={{borderRadius: '7px'}} />
                 <h4 style={{ marginLeft: "10px" }}>
                   {dmName && dmName}
@@ -98,7 +111,6 @@ const Dm = () =>{
               <ChatMessages>
                 {dmMessages?.docs.map((doc) => {
                   const { message, timestamp, user, userImage, fileDownloadUrl, likes } = doc.data();
-                  console.log(message)
                   return (
                     <Message
                       Private={null}
@@ -185,7 +197,17 @@ const HeaderLeft = styled.div`
       display: flex;
       text-transform: lowercase;
       margin-right: 5px;
+      :hover{
+        opacity: 0.8;
+        cursor: pointer;
+        text-decoration: underline;
+      }
     }
+    :hover{
+      text-decoration: underline;
+      cursor: pointer;
+    }
+    
   }
 `;
 

@@ -132,11 +132,9 @@ function SideBar(props) {
           )}
         </InboxContainer>
       </Link>
-      <SideBarOption Icon={DraftsIcon} title="Saved" />
       <a href="/bookmarks" style={{ textDecoration: "none", color: "black" }}>
         <SideBarOption Icon={BookmarkBorderIcon} title="My Bookmarks" />
       </a>
-      <SideBarOption Icon={PeopleAltIcon} title="User groups & People" />
       <SideBarOption Icon={FileCopyIcon} title="Files" />
 
       <hr />
@@ -295,9 +293,7 @@ const InboxContainer = styled.div`
     margin-left: 2px;
     padding-bottom: 4px;
   }
-  :hover {
-    background-color: white;
-  }
+  
 `;
 
 const SideBarContainer = styled.div`

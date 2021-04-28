@@ -1,9 +1,11 @@
 import React, { useState } from "react";
+import { useHistory } from 'react-router';
 import styled from "styled-components";
 
-function MemberCard({ profilePic, username, email, handleSelected }) {
+function MemberCard({ profilePic,  username, email, handleSelected }) {
   const [change, setChange] = useState(false);
   const [color, setColor] = useState("white");
+  const history = useHistory()
 
   const handleClick = () => {
     if (handleSelected) {
@@ -17,6 +19,11 @@ function MemberCard({ profilePic, username, email, handleSelected }) {
             setChange(false)
         }
       
+    }else{
+      history.push({
+        pathname: "/user/profile",
+        search: email
+      })
     }
   };
 
@@ -27,7 +34,6 @@ function MemberCard({ profilePic, username, email, handleSelected }) {
     >
       <img src={profilePic} />
       {username && <h3>{username}</h3>}
-      {email && <h4>{email}</h4>}
     </MemberCardContainer>
   );
 }

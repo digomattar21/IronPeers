@@ -4,7 +4,8 @@ import { auth } from "../firebase";
 class Api {
   constructor() {
     this.api = axios.create({
-       baseURL: 'https://ironpeersapi.herokuapp.com',
+      //  baseURL: 'https://ironpeersapi.herokuapp.com',
+      baseURL: 'http://localhost:3080'
     });
 
     this.api.interceptors.request.use((config) => {
@@ -374,6 +375,43 @@ class Api {
   async checkDelete(payload) {
     try {
       let req = await this.api.post('/private/channel/checkdeletemessage', payload)
+      return req
+    } catch (error) {
+      throw error
+    }
+  }
+
+  async getUserProfile(payload){
+    try {
+      let req = await this.api.post('/private/user/getprofile', payload)
+      return req
+    } catch (error) {
+      throw error
+    }
+
+  }
+
+  async addNewAbility(payload){
+    try {
+      let req = await this.api.post('/private/user/profile/addnewability', payload)
+      return req
+    } catch (error) {
+      throw error
+    }
+  }
+
+  async deleteUserAbility(payload){
+    try {
+      let req = await this.api.post('/private/user/profile/deleteability', payload);
+      return req
+    } catch (error) {
+      throw error
+    }
+  }
+
+  async getUserEmail(payload){
+    try {
+      let req = await this.api.post('/private/user/getemail', payload);
       return req
     } catch (error) {
       throw error

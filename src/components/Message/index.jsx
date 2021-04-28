@@ -173,7 +173,7 @@ function Message({
           .doc(id)
           .delete();
           try{
-            let checkIfPinned = await Api.checkDelete({channeFirebaseId: channelId, Private: Private, messageFirebaseId: id});
+            let checkIfPinned = await Api.checkDelete({channelFirebaseId: channelId, Private: Private, messageFirebaseId: id});
             console.log(checkIfPinned)
           }catch(err){
             console.log(err)

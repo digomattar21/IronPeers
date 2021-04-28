@@ -4,7 +4,7 @@ import { Avatar, Button } from "@material-ui/core";
 import SendIcon from "@material-ui/icons/Send";
 import AccessTimeIcon from "@material-ui/icons/AccessTime";
 import SearchIcon from "@material-ui/icons/Search";
-import HelpOutlineIcon from "@material-ui/icons/HelpOutline";
+import SettingsIcon from '@material-ui/icons/Settings';
 import { auth } from "../../firebase";
 import { useAuthState } from "react-firebase-hooks/auth";
 import ArrowBackIcon from "@material-ui/icons/ArrowBack";
@@ -32,13 +32,27 @@ function Header() {
     setOpenModal(true)
   }
 
+  const handleProfileClick = async()=>{
+    try {
+      let userId = user.email;
+      history.push({
+        pathname: "/user/profile",
+        search: `${userId}`
+      })
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
   const open = Boolean(anchorEl);
   const id = open ? "simple-popper" : undefined;
 
   return (
     <HeaderContainer>
       <HeaderLeft>
-        <HeaderAvatar alt={user?.displayName} src={user?.photoURL} />
+        <HeaderAvatar 
+        onClick={()=>handleProfileClick()}
+        alt={user?.displayName} src={user?.photoURL} />
 
         <div className="arrowsContainer">
           <ArrowBackIcon onClick={() => history.goBack()} />
@@ -55,7 +69,7 @@ function Header() {
 
       <HeaderRight>
         <Button className='settingsPopperBtn' aria-describedby={id} type="button" onMouseEnter={handleEnter} onMouseLeave={handleLeave} onClick={handleOpen}>
-          <HelpOutlineIcon />
+          <SettingsIcon />
         </Button>
         <Popper id={id} open={open} anchorEl={anchorEl} className='popper'>
           <div style={{backgroundColor: '#282828', color:'white', padding: '10px 15px', borderRadius:'5px' }}>Settings</div>
