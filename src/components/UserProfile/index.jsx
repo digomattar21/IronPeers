@@ -18,6 +18,7 @@ function UserProfile() {
   const [habInput, setHabInput] = useState("");
   const [reload, setReload] = useState(false);
   const [message, setMessage] = useState(null);
+  const [bio, setBio] = useState('');
 
   const getUserProfile = async () => {
     let payload;
@@ -30,6 +31,7 @@ function UserProfile() {
       setProfileInfo(req.data.profile);
       setUsername(req.data.username);
       setPhotoURL(req.data.profilePic);
+      setBio(req.data.profile.bio?req.data.profile.bio:'')
       console.log(req.data);
       if (user.email === req.data.profile.email) {
         setOwnProfile(true);
@@ -52,12 +54,34 @@ function UserProfile() {
     }
   }
 
+  const handleBioSubmit = async (e) =>{
+    e.preventDefault();
+    let bioRegex = /[a-zA-Z0-9]/
+    if (bio && bioRegex.test(bio) ){
+      let payload = {userEmail: user.email, newBio: bio}
+    try {
+      setBio('')
+      let req = await Api.setNewBio(payload);
+      console.log(req)
+      setBio(bio)
+
+    } catch (error) {
+      console.log(error)
+    }
+    }
+  }
+
   useEffect(() => {
     getUserProfile();
   }, [reload]);
 
   const handleChange = (e) => {
-    setHabInput(e.target.value)
+    const { name, value } = e.target;
+    if (name==='bio'){
+      setBio(e.target.value);
+    }else{
+      setHabInput(e.target.value)
+    }
   };
 
   return (
@@ -68,7 +92,37 @@ function UserProfile() {
       </ProfileHeaderContainer>
 
       <ProfileLowerContainer>
+        {profileInfo && ownProfile && (
+          <BioInputContainer>
+          <form onSubmit={(e)=>handleBioSubmit(e)}>
+          <h3 style={{color: 'gray', marginBottom: '5px'}}>Bio:</h3>
+          <TextField
+              id="input"
+              variant="outlined"
+              name="bio"
+              onChange={(e) => handleChange(e)}
+              className="input2"
+              value={bio}
+              style={{minWidth: '80%'}}
+            />
+          </form>
+          <button hidden type='submit'></button>
+          </BioInputContainer>
+          
+          )}
+
+
+        {profileInfo && !ownProfile && profileInfo.bio && (
+          <>
+          <h3 style={{color: 'gray', marginBottom: '5px'}}>Bio:</h3>
+          <BioContainer>
+
+          </BioContainer>
+          </>
+        )}
+        <h3 style={{color: 'gray', marginBottom: '4px'}}>Abilities:</h3>
         <AbilitiesContainer>
+        
         {profileInfo &&
         !ownProfile && 
           profileInfo.abilities.length > 0 &&
@@ -80,7 +134,6 @@ function UserProfile() {
         </AbilitiesContainer>
         {profileInfo && ownProfile && (
           <form onSubmit={(e)=>handleAbilitySubmit(e)}>
-            <h3 style={{ color: "gray", marginBottom: "5px" }}>Abilities:</h3>
             <TextField
               id="input"
               label="Add ability"
@@ -95,6 +148,7 @@ function UserProfile() {
           </form>
         )}
         <AbilitiesContainer>
+        
         {profileInfo &&
           ownProfile &&
           profileInfo.abilities.length > 0 &&
@@ -124,6 +178,14 @@ function UserProfile() {
 }
 
 export default UserProfile;
+
+const BioInputContainer = styled.div`
+  margin-bottom: 10px;
+`;
+
+const BioContainer = styled.div`
+
+`
 
 const ProfileMainContainer = styled.div`
   flex: 0.7;

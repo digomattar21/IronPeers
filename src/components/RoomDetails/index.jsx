@@ -10,6 +10,7 @@ import PinnedMessage from "../PinnedMessage";
 import CachedIcon from "@material-ui/icons/Cached";
 import PeopleAltIcon from "@material-ui/icons/PeopleAlt";
 import MemberCard from "../MemberCard";
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 function RoomDetails({ channelId, isPrivate }) {
   const [messagesArray, setMessagesArray] = useState(null);
@@ -56,6 +57,8 @@ function RoomDetails({ channelId, isPrivate }) {
           newArray.push(temp.data());
         }
         setMessagesArray(newArray);
+      }else{
+        setMessagesArray([])
       }
     } catch (error) {
       console.log(error);
@@ -87,7 +90,7 @@ function RoomDetails({ channelId, isPrivate }) {
                 />
               );
             })}
-          {!messagesArray && <CachedIcon className="cachedIcon" />}
+          {!messagesArray && <CircularProgress style={{marginTop: '80px', color: 'var(--ironblue-color)'}}/>}
         </PinnedMessagesList>
       </PinnedMessagesContainer>
       <MembersContainer>
@@ -104,7 +107,7 @@ function RoomDetails({ channelId, isPrivate }) {
             )
           })
         )}
-        {!membersArray && <CachedIcon className="cachedIcon" />}
+        {!membersArray && <CircularProgress style={{marginTop: '80px', color: 'var(--ironblue-color)'}}/>}
         </MembersList>
       </MembersContainer>
     </RoomDetailsContainer>

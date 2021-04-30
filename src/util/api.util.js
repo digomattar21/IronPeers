@@ -4,7 +4,7 @@ import { auth } from "../firebase";
 class Api {
   constructor() {
     this.api = axios.create({
-       baseURL: 'https://ironpeersapi.herokuapp.com',
+      baseURL: 'https://ironpeersapi.herokuapp.com',
       // baseURL: 'http://localhost:3080'
     });
 
@@ -415,6 +415,24 @@ class Api {
       return req
     } catch (error) {
       throw error
+    }
+  }
+
+  async setNewBio(payload){
+    try {
+        let req = await this.api.post('/private/user/profile/setnewbio', payload);
+        return req
+    } catch (error) {
+      throw error
+    }
+  }
+
+  async mainSearch(payload){
+    try{
+      let req = await this.api.post('/private/mainsearch', payload);
+      return req
+    }catch(err){
+      throw err
     }
   }
 
