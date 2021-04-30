@@ -31,7 +31,7 @@ function CreateChannelModal({ open, setOpen, setUpdatedSideBar, updatedSideBar }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const reg = /^[a-z]+$/i;
+    const reg = /[a-zA-Z0-9]/i;
     try {
       if (reg.test(title)) {
         if (!privateChecked) {
@@ -59,7 +59,7 @@ function CreateChannelModal({ open, setOpen, setUpdatedSideBar, updatedSideBar }
           };
           let req3 = await Api.addPrivateChannel(payload);
         }
-        setOpen(false);
+        handleClose();
         setUpdatedSideBar(!updatedSideBar);
       } else {
         setMessage("Invalid title, please use only letters, no spaces");

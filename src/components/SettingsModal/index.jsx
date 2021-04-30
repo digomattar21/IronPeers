@@ -24,12 +24,12 @@ function SettingsModal({ open, setOpen }) {
     setMessage(null);
   };
 
-  const handleResetEmailClick = () =>{
-   
-  }
 
   const handleResetPasswordClick = () =>{
-    auth.sendPasswordResetEmail()
+    auth.sendPasswordResetEmail(user.email, (resp)=>{
+      console.log(resp)
+    })
+    setMessage('Email With password reset instructions was sent successfully')
   }
 
   return (
@@ -80,7 +80,7 @@ function SettingsModal({ open, setOpen }) {
                   />
                 </div>
                 {!auth.currentUser.emailVerified && (
-                  {/* <>
+                  <>
                   <div className="emailContainer">
                     <h3>Password: </h3>
                     <h4>*********</h4>
@@ -100,29 +100,15 @@ function SettingsModal({ open, setOpen }) {
                     >
                       Reset Password
                     </Button>
-                    <Button
-                      type="button"
-                      style={{
-                        backgroundColor: "red",
-                        color: "white",
-                        marginTop: "4px",
-                        marginLeft: '5px'
-                      }}
-                      onClick={()=>handleResetEmailClick()}
-                    >
-                      Reset Email
-                    </Button>
-
-
                     </section>
                   </div>
                   
-                  </> */}
+                  </>
                 )}
               </InfoContainer>
 
               {message && (
-                <h6 style={{ color: "red", textAlign: "center" }}>{message}</h6>
+                <h5 style={{ color: "red", textAlign: "center", marginTop: '10px' }}>{message}</h5>
               )}
             </form>
           </LoginFormContainer>

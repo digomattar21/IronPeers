@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useHistory } from 'react-router';
 import styled from "styled-components";
 
-function MemberCard({ profilePic,  username, email, handleSelected }) {
+function MemberCard({ profilePic,  username, email, handleSelected, yes }) {
   const [change, setChange] = useState(false);
   const [color, setColor] = useState("white");
   const history = useHistory()
@@ -33,7 +33,10 @@ function MemberCard({ profilePic,  username, email, handleSelected }) {
       style={{ backgroundColor: color, opacity: 0.8 }}
     >
       <img src={profilePic} />
+      <div>
       {username && <h3>{username}</h3>}
+      {email && yes && <h4>{email}</h4>}
+      </div>
     </MemberCardContainer>
   );
 }
@@ -55,9 +58,24 @@ const MemberCardContainer = styled.div`
     max-height: 36px;
     border-radius: 6px;
     margin-right: 5px;
+    :hover {
+    opacity: 0.6;
+    cursor: pointer;
+  }
   }
   :hover {
-    opacity: 0.8;
+    opacity: 0.6;
     cursor: pointer;
+  }
+  >div{
+    display:flex;
+    flex-direction: column;
+    >h4{
+      color: var(--ironblue-color)
+    }
+    :hover {
+    opacity: 0.6;
+    cursor: pointer;
+  }
   }
 `;

@@ -83,7 +83,7 @@ const Dm = () =>{
     <ChannelContainer>
       {dmDetails && dmMessages && (
         <>
-          <Header>
+          <Header >
             <HeaderLeft>
               <div className="first-container" onClick={()=>handleMemberClick()}>
                 <img src={profilePic && profilePic} width='32' height='32' style={{borderRadius: '7px'}} />

@@ -150,6 +150,7 @@ const Header = styled.div`
   padding: 20px;
   border-bottom: 1px solid lightgray;
   position: fixed;
+  z-index: 1;
   background-color: white;
   width: 80%;
 `;
