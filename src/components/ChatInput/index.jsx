@@ -127,7 +127,6 @@ function ChatInput({ channelName, channelId, chatBottomRef, Private, dmId }) {
       await fileRef.put(file);
       setFileUrl(await fileRef.getDownloadURL());
       setHasFile(true);
-      console.log(fileUrl);
       setLoadingState(false)
     } catch (err) {
       console.log(err);

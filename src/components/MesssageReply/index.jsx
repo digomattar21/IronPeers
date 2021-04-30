@@ -106,10 +106,8 @@ function MessageReply({
                   <a target="_blank" href={fileDownloadUrl}>
                     <InsertDriveFileIcon
                       className="fileIcon"
-                      // onClick={() => downloadFile()}
                     />
                   </a>
-                  {/* <GetAppIcon className='downloadIcon'/> */}
                   <h4>.{checkFileType(fileDownloadUrl)[1]}</h4>
                   {error && <h4 style={{ color: "red" }}>{error}</h4>}
                 </div>

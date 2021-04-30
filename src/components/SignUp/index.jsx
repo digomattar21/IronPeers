@@ -17,7 +17,6 @@ function SignUp() {
     e.preventDefault();
     try {
       let signin = await auth.signInWithPopup(provider);
-      console.log(signin);
       let payload = {
         username: signin.user.displayName,
         email: signin.user.email,

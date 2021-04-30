@@ -49,7 +49,6 @@ function Inbox() {
           {allInvites &&
             allInvites.length > 0 &&
             allInvites.map((invite) => {
-              console.log(invite._id);
               return (
                 <>
                   <InviteCard

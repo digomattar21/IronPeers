@@ -23,7 +23,6 @@ function RoomDetails({ channelId, isPrivate }) {
       let req = await Api.getPrivateChannelPinnedMessages(payload);
       let req2 = await Api.getChannelMembers(payload);
       await getPinnedMessages(req.data.messageFirebaseIds);
-      console.log('reqqqqq', req2)
       await getMembersInfo(req2.data.members)
       
     } catch (error) {
@@ -81,7 +80,6 @@ function RoomDetails({ channelId, isPrivate }) {
           {messagesArray &&
             messagesArray.length > 0 &&
             messagesArray.map((message) => {
-              console.log(message)
               return (
                 <PinnedMessage
                   message={message}

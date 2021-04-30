@@ -27,7 +27,7 @@ function MainSearch() {
   },[allThreads,location])
 
   const getThreadsResults = () =>{
-    console.log(allThreads);
+    console.log('OK');
   }
 
   
@@ -35,7 +35,6 @@ function MainSearch() {
     try {
       let payload = {userEmail: user.email,  query: location.state.query};
       let req = await Api.mainSearch(payload);
-      console.log(req)
       setUserResults(req.data.results)
     } catch (error) {
       

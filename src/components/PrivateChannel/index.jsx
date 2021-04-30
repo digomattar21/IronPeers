@@ -49,7 +49,6 @@ function PrivateChannel() {
     try {
       if (channelId) {
         let req = await Api.getPrivateChannelMembersLength(channelId);
-        console.log(req);
         setMembersLength(req.data.membersLength);
       }
     } catch (error) {

@@ -24,7 +24,6 @@ function PinnedMessage({ message, channelId, isPrivate }) {
     }
   };
 
-  console.log(message)
 
   return (
     <MessageContainer>
@@ -53,10 +52,8 @@ function PinnedMessage({ message, channelId, isPrivate }) {
                   <a target="_blank" href={message?.fileDownloadUrl}>
                     <InsertDriveFileIcon
                       className="fileIcon"
-                      // onClick={() => downloadFile()}
                     />
                   </a>
-                  {/* <GetAppIcon className='downloadIcon'/> */}
                   <h4>.{checkFileType(message?.fileDownloadUrl)[1]}</h4>
                   {error && <h4 style={{ color: "red" }}>{error}</h4>}
                 </div>
