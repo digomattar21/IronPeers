@@ -40,7 +40,6 @@ function DmModal({ open, setOpen, updatedSideBar, setUpdatedSideBar }) {
         dmName: `${user.displayName} & ${selectedUser}`
       };
 
-      console.log(dm.id);
       let req = await Api.sendDmRequest(payload);
 
       setUpdatedSideBar(!updatedSideBar)
@@ -64,7 +63,6 @@ function DmModal({ open, setOpen, updatedSideBar, setUpdatedSideBar }) {
         };
 
         let req = await Api.searchForUser(payload);
-        console.log(req);
         if (req.data.results.length <= 0) {
           setMessage("No results found");
         }

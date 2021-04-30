@@ -36,7 +36,6 @@ function BookmarkedCard({ bookmark, reRender, setReRender }) {
       fileDownload(req.data, 'download');
      } catch (error) {
         setError('Unable to download');
-        console.log(error?.message)
      }
     }}
 

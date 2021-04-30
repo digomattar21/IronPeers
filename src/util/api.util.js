@@ -5,7 +5,6 @@ class Api {
   constructor() {
     this.api = axios.create({
       baseURL: 'https://ironpeersapi.herokuapp.com',
-      // baseURL: 'http://localhost:3080'
     });
 
     this.api.interceptors.request.use((config) => {
@@ -13,7 +12,6 @@ class Api {
         config.headers ={
           Authorization: `Bearer ${token}`
         };
-        console.log(token)
         return config;
     });
 
@@ -24,10 +22,7 @@ class Api {
       (error) => {
         if (typeof window !== "undefined") {
           localStorage.removeItem("token");
-          // auth.signOut()
-          // window.location='/'
           throw JSON.stringify(error.response.data.message);
-          // console.log(error)
         }
       }
     );
@@ -53,10 +48,6 @@ class Api {
     }
   }
 
-  async signout() {
-
-  }
-
   async setToken(payload){
     try {
       let req = await this.api.post('/private/signin/email', payload);
@@ -72,12 +63,9 @@ class Api {
   async signUpWithGoogle(payload) {
     try {
       let req = await this.api.post("/auth/signup/google", payload);
-      console.log(req)
-      console.log(req.data.token)
       localStorage.setItem("token", req.data.token);
       return req;
     } catch (error) {
-      console.log('erro', error)
       throw error;
     }
   }
@@ -87,7 +75,7 @@ class Api {
       let req = await this.api.get('/private/user/getinfo')
       return req
     }catch(err){
-      console.log(err)
+      throw err
     }
   }
 
@@ -151,7 +139,6 @@ class Api {
   async addUserBookMark(payload) {
     try {
       let req = await this.api.post("/private/user/adduserbookmark", payload);
-      console.log(req);
       return req;
     } catch (error) {
       throw error;
@@ -161,7 +148,6 @@ class Api {
   async addPrivateUserBookMark(payload){
     try {
       let req = await this.api.post("/private/user/adduserprivatebookmark", payload);
-      console.log(req);
       return req;
     } catch (error) {
       throw error;
@@ -234,7 +220,6 @@ class Api {
   async userJoinChannel(payload){
     try {
         let req = await this.api.post('/private/user/joinchannel', payload);
-        console.log(req);
         return req
 
     } catch (error) {
@@ -319,7 +304,6 @@ class Api {
   async removeBookmarkedMessage(payload){
     try {
       let req = await this.api.post('/private/user/removebookmarkedmessage', payload);
-      console.log(req)
       return req
     } catch (error) {
       throw error
@@ -329,7 +313,6 @@ class Api {
   async getChannelMembers(payload){
     try {
       let req = await this.api.post('/private/channel/getmembers',payload);
-      console.log(req)
       return req
     } catch (error) {
       throw error
@@ -433,6 +416,15 @@ class Api {
       return req
     }catch(err){
       throw err
+    }
+  }
+
+  async setNewGitUrl(payload){
+    try {
+      let req = await this.api.post('/private/user/setnewgiturl', payload);
+      return req
+    } catch (error) {
+      throw error
     }
   }
 

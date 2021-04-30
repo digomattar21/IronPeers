@@ -64,7 +64,7 @@ function Message({
         req = await Api.bookMarkMessage(payload);
       }
       if (userState.email) {
-        console.log(fileDownloadUrl);
+       
         const newPayload = {
           channelId: channelId,
           messageFirebaseId: id,
@@ -78,7 +78,6 @@ function Message({
           let updatedPrivateUserBookmarks = await Api.addPrivateUserBookMark(
             newPayload
           );
-          console.log("entrou");
         } else if (Private == false) {
           let updatedUserBookmarks = await Api.addUserBookMark(newPayload);
         }
@@ -164,7 +163,6 @@ function Message({
   };
 
   const handleDeleteClick = async (e) => {
-    console.log(user, userState.displayName);
     if (user === userState.displayName) {
       if (Private == true || Private == false) {
         db.collection(Private ? "privaterooms" : "rooms")
@@ -174,7 +172,6 @@ function Message({
           .delete();
           try{
             let checkIfPinned = await Api.checkDelete({channelFirebaseId: channelId, Private: Private, messageFirebaseId: id});
-            console.log(checkIfPinned)
           }catch(err){
             console.log(err)
           }
@@ -257,13 +254,12 @@ function Message({
                 />
               ) : (
                 <div>
-                  <a target="_blank" href={fileDownloadUrl}>
+                  <a target="_blank" href={fileDownloadUrl} download={fileDownloadUrl.slice(30,40)}>
                     <InsertDriveFileIcon
+                      style={{color: 'var(--ironblue-color)'}}
                       className="fileIcon"
-                      // onClick={() => downloadFile()}
                     />
                   </a>
-                  {/* <GetAppIcon className='downloadIcon'/> */}
                   <h4>.{checkFileType(fileDownloadUrl)[1]}</h4>
                   {error && <h4 style={{ color: "red" }}>{error}</h4>}
                 </div>
@@ -301,7 +297,7 @@ function Message({
                     fileDownloadUrl,
                     likes,
                   } = doc.data();
-                  console.log(fileDownloadUrl);
+
                   return (
                     <MessageReply
                       key={doc.id}

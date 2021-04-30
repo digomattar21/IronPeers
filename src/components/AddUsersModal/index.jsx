@@ -28,7 +28,6 @@ import {
       try {
         if (reg.test(email)) {
             let payload = { userWhoInvited: user.email, channelId: channelId, userInvited: email };
-            console.log(user.email, email)
 
             let req = await Api.sendPrivateChannelInvite(payload);
             setMessage(req.data.message)

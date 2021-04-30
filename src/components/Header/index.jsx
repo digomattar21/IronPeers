@@ -39,7 +39,7 @@ function Header() {
   const [loading, setLoading] = useState(false);
 
   const handleClick = () => {
-    console.info(`You clicked ${options[selectedIndex]}`);
+    console.log(options[selectedIndex])
   };
 
   const handleMenuItemClick = (event, index) => {
@@ -248,7 +248,6 @@ const HeaderContainer = styled.div`
   color: black;
 `;
 
-// Header left styles
 const HeaderLeft = styled.div`
   flex: 0.3;
   display: flex;
@@ -278,7 +277,6 @@ const HeaderAvatar = styled(Avatar)`
   }
 `;
 
-// Header Mid Search styles
 const HeaderSearch = styled.div`
   flex: 0.4;
   opacity: 0.5;
@@ -311,7 +309,6 @@ const HeaderSearch = styled.div`
   }
 `;
 
-// Header Right
 const HeaderRight = styled.div`
   flex: 0.3;
   display: flex;

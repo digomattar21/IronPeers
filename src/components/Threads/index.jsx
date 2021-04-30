@@ -25,7 +25,7 @@ function Threads() {
   const handleOpen = () => {
     setOpen(true);
   };
-  // auth.signOut()
+
   return (
     <ThreadsContainer>
       <TitleContainer>

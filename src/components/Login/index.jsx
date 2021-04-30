@@ -20,7 +20,6 @@ function Login() {
         profilePic: signin.user.photoURL,
       };
       let apiReq = await Api.signUpWithGoogle(payload);
-      console.log(apiReq);
     } catch (errr) {
       console.log(errr);
     }

@@ -67,7 +67,6 @@ function InviteCard({
     };
     try {
       let req = await Api.userJoinPrivateChannel(payload);
-      console.log(req);
     } catch (error) {
       console.log(error);
     }
@@ -82,7 +81,6 @@ function InviteCard({
     }
     try {
       let req = await Api.addNewDm(payload);
-      console.log(req)
       db.collection("dms").doc(dmId).set({
         userTwoProfilePic: user.photoURL},
         {merge: true}

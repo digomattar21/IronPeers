@@ -15,6 +15,7 @@ function UserProfile() {
   const [ownProfile, setOwnProfile] = useState(false);
   const [username, setUsername] = useState("");
   const [photoURL, setPhotoURL] = useState("");
+  const [gitURL, setGitURL] = useState("");
   const [habInput, setHabInput] = useState("");
   const [reload, setReload] = useState(false);
   const [message, setMessage] = useState(null);
@@ -24,7 +25,7 @@ function UserProfile() {
     let payload;
     location.search &&
       (payload = { userId: location.search.slice(1, location.search.length) });
-    console.log(payload);
+
 
     try {
       let req = await Api.getUserProfile(payload);
@@ -32,7 +33,7 @@ function UserProfile() {
       setUsername(req.data.username);
       setPhotoURL(req.data.profilePic);
       setBio(req.data.profile.bio?req.data.profile.bio:'')
-      console.log(req.data);
+      setGitURL(req.data.profile.githubUrl)
       if (user.email === req.data.profile.email) {
         setOwnProfile(true);
       }
@@ -62,12 +63,25 @@ function UserProfile() {
     try {
       setBio('')
       let req = await Api.setNewBio(payload);
-      console.log(req)
       setBio(bio)
 
     } catch (error) {
       console.log(error)
     }
+    }
+  }
+
+  const handleGitURLSubmit = async (e)=>{
+    e.preventDefault();
+    let urlRegex = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()!@:%_\+.~#?&\/\/=]*)/
+    if (urlRegex.test(gitURL)){
+      let payload = {userEmail: user.email, url: gitURL}
+      try {
+        let req = await Api.setNewGitUrl(payload);
+      } catch (error) {
+        console.log(error);
+        setMessage(error)        
+      }
     }
   }
 
@@ -79,6 +93,8 @@ function UserProfile() {
     const { name, value } = e.target;
     if (name==='bio'){
       setBio(e.target.value);
+    }else if (name==='gitURL'){
+      setGitURL(e.target.value);
     }else{
       setHabInput(e.target.value)
     }
@@ -116,7 +132,7 @@ function UserProfile() {
           <>
           <h3 style={{color: 'gray', marginBottom: '5px'}}>Bio:</h3>
           <BioContainer>
-
+            {profileInfo.bio}
           </BioContainer>
           </>
         )}
@@ -158,6 +174,31 @@ function UserProfile() {
             )
           })}
           </AbilitiesContainer>
+        
+        {profileInfo && ownProfile && (
+
+          <form onSubmit={(e)=>handleGitURLSubmit(e)}>
+          <h3 style={{color: 'gray', marginBottom: '4px', marginTop: '20px'}}>GitHub:</h3>
+            <TextField
+              id="input3"
+              label="github"
+              variant="outlined"
+              name="gitURL"
+              onChange={(e) => handleChange(e)}
+              className="input"
+              value={gitURL}
+            />
+            {message && <h6 style={{fontWeight: '500', color: 'red'}}>{message}</h6>}
+            <Button hidden type='submit' />
+            </form>
+        )}
+
+        {profileInfo && !ownProfile && profileInfo.githubUrl && (
+          <ProfileCard>
+            <h3>Github:</h3>
+            <h4>{profileInfo.githubUrl}</h4>
+          </ProfileCard>
+        )}
 
         {profileInfo && profileInfo.email && (
           <ProfileCard>
@@ -184,7 +225,10 @@ const BioInputContainer = styled.div`
 `;
 
 const BioContainer = styled.div`
-
+  margin-bottom: 30px;
+  border: 1px solid gray;
+  border-radius: 5px;
+  padding: 5px 10px;
 `
 
 const ProfileMainContainer = styled.div`
