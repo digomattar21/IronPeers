@@ -1,6 +1,6 @@
 # Iron Peers
 
-IronPeers is a social network made for Ironhack alumni that gives the users freedom to browse channels in ironhack community as well as sharing ideas, files and real chat messaging.
+IronPeers is a social network made for Ironhack alumni that gives the users freedom to create & browse channels in ironhack community as well as sharing ideas, files and real chat messaging.
 
 ### Features
 
